@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Max Huang — for the AMBC CEO-office Associate role</title>
+<meta name="description" content="Max Huang — AI workflows, writing and research. Built for the AMBC Associate (CEO Office) application.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FBFAF6; --panel:#FFFFFF; --ink:#15181B; --muted:#5C636B;
+    --line:#E6E2D8; --accent:#15795B; --accent-ink:#0E5D44;
+    --accent-wash:#EAF3EE;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    font-size:17px; line-height:1.62; letter-spacing:-0.005em;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:780px; margin:0 auto; padding:0 26px}
+  a{color:var(--accent-ink); text-decoration:none; border-bottom:1px solid rgba(21,121,91,.3); transition:border-color .15s,color .15s}
+  a:hover{color:var(--accent); border-color:var(--accent)}
+  h1,h2,h3{font-family:"Newsreader",Georgia,serif; font-weight:500; letter-spacing:-0.01em; line-height:1.15}
+  .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+
+  /* HERO */
+  header{padding:78px 0 30px}
+  .eyebrow{color:var(--accent-ink); font-weight:600}
+  h1{font-size:54px; margin:18px 0 6px}
+  .tagline{font-family:"Newsreader",Georgia,serif; font-size:23px; color:var(--ink); margin:0 0 22px; max-width:39ch; font-weight:400}
+  .tagline b{font-weight:600; color:var(--accent-ink)}
+  .meta{display:flex; flex-wrap:wrap; gap:7px 16px; font-size:14.5px; color:var(--muted); padding-top:6px; border-top:1px solid var(--line)}
+  .meta b{color:var(--ink); font-weight:500}
+  .accentrule{height:3px; width:54px; background:var(--accent); margin:26px 0 0; border-radius:2px}
+
+  /* SECTIONS */
+  section{padding:42px 0; border-top:1px solid var(--line)}
+  .seclabel{display:flex; align-items:baseline; gap:12px; margin-bottom:8px}
+  .seclabel .num{color:var(--accent); font-weight:600}
+  h2{font-size:30px; margin:4px 0 6px}
+  .lede{color:var(--muted); font-size:16px; max-width:62ch; margin:0 0 20px}
+
+  /* PROJECT */
+  .proj{padding:24px 0; border-bottom:1px solid var(--line)}
+  .proj:last-child{border-bottom:0; padding-bottom:4px}
+  .proj h3{font-size:21px; margin:0 0 3px}
+  .proj .what{margin:0 0 16px; color:var(--ink)}
+  .rows{display:grid; grid-template-columns:92px 1fr; gap:9px 18px; align-items:start}
+  .rows .k{font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); padding-top:3px}
+  .rows .v{font-size:15.5px; line-height:1.55; margin:0}
+  .quote{margin:14px 0 0; padding:12px 16px; background:var(--accent-wash); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; font-family:"Newsreader",Georgia,serif; font-size:16px; color:var(--accent-ink)}
+  .quote span{display:block; font-family:ui-monospace,Menlo,monospace; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-top:7px; opacity:.85}
+
+  /* WEEK ONE */
+  .wk{counter-reset:wk; display:grid; gap:16px; margin-top:6px}
+  .wk .item{display:grid; grid-template-columns:34px 1fr; gap:14px}
+  .wk .item::before{counter-increment:wk; content:counter(wk); font-family:"Newsreader",serif; font-size:24px; color:var(--accent); line-height:1.2}
+  .wk h3{font-size:17.5px; margin:2px 0 3px}
+  .wk p{margin:0; font-size:15.5px; color:var(--muted)}
+  .wk p b{color:var(--ink); font-weight:500}
+
+  /* AI NOTE */
+  .ainote{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px 24px}
+  .ainote h2{font-size:21px; margin:0 0 8px}
+  .ainote p{margin:0; color:var(--muted); font-size:15.5px}
+  .ainote p b{color:var(--ink); font-weight:500}
+
+  footer{padding:34px 0 70px; border-top:1px solid var(--line); color:var(--muted); font-size:14.5px}
+  footer a{font-weight:500}
+
+  @media (max-width:560px){
+    body{font-size:16px}
+    h1{font-size:40px}
+    .tagline{font-size:20px}
+    h2{font-size:25px}
+    .rows{grid-template-columns:1fr; gap:2px 0}
+    .rows .k{padding-top:10px}
+    header{padding:54px 0 24px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="mono eyebrow">For the AMBC Associate — CEO Office</div>
+    <h1>Max Huang</h1>
+    <p class="tagline">I build and run <b>AI workflows</b>, and I turn messy inputs into <b>structured writing</b>. I already do this every day — for myself.</p>
+    <div class="meta">
+      <span><b>Brisbane, AU</b> · relocating to China</span>
+      <span><b>UQ</b> · Business Management, grad Jun 2026</span>
+      <span><a href="mailto:huangmmax@gmail.com">huangmmax@gmail.com</a></span>
+      <span><a href="https://github.com/maxi-max-dev">github.com/maxi-max-dev</a></span>
+    </div>
+    <div class="accentrule"></div>
+  </header>
+
+  <section>
+    <div class="seclabel"><span class="mono num">00</span><span class="mono">Why this role</span></div>
+    <h2>Your version just has real stakes</h2>
+    <p class="lede" style="font-size:17px;color:var(--ink);max-width:64ch">
+      You said you care about how someone thinks and how they use AI — not their discipline or year. So instead of a cover letter, here's the evidence: four things I've built and run, in my own time, with AI as the main instrument. Below them are three workflows I'd build for the CEO office in week one. The page itself is one more data point — I made it with Claude Code in well under an hour.
+    </p>
+  </section>
+
+  <section>
+    <div class="seclabel"><span class="mono num">01</span><span class="mono">What I've built &amp; run</span></div>
+    <h2>AI as staff, not novelty</h2>
+    <p class="lede">Each of these runs on its own. I designed the roles, the routing, the failure handling — and I have no engineering background.</p>
+
+    <div class="proj">
+      <h3>MiroFish — a prediction engine that writes a morning brief</h3>
+      <p class="what">A multi-agent “swarm simulation”: it ingests the day's news and policy seeds, builds a small world of AI personas, runs them forward, and writes a structured forecast with a confidence rating.</p>
+      <div class="rows">
+        <div class="k">Pipeline</div><p class="v">News seed → knowledge graph + persona generation → multi-round agent simulation → report synthesis → delivery.</p>
+        <div class="k">How I used AI</div><p class="v">Qwen LLMs drive the agents; Zep gives them long-term memory; the OASIS framework runs the simulation. I wired the pipeline and the daily trigger end-to-end.</p>
+        <div class="k">Result</div><p class="v">Runs unattended every morning and posts the brief to a channel — no hands on it. A recent run forecast the US–China tariff talks at medium-high confidence.</p>
+      </div>
+    </div>
+
+    <div class="proj">
+      <h3>OpenClaw — a 5-agent system I run 24/7</h3>
+      <p class="what">My personal operations desk: five specialised agents — an orchestrator, a market-trading agent, a news monitor, a research/judgment agent, and a mobile agent — that research, draft, trade (in a sharemarket game), and report on their own.</p>
+      <div class="rows">
+        <div class="k">Scope</div><p class="v">~A dozen scheduled jobs running live: morning briefs, weekly news summaries, market reviews, job-market scans, nightly self-review.</p>
+        <div class="k">How I used AI</div><p class="v">I authored each agent's role, model routing, tool permissions and failure handling, plus the schedules — and added live-data browser automation and semantic memory.</p>
+        <div class="k">Result</div><p class="v">A working model of “AI as back-office staff”: it runs unattended with failure alerts and self-recovery when something drops.</p>
+      </div>
+    </div>
+
+    <div class="proj">
+      <h3>Research → written intelligence</h3>
+      <p class="what">Taking messy, multi-source inputs and turning them into a clear written view — the core of this role.</p>
+      <div class="rows">
+        <div class="k">Range</div><p class="v">A 45-page mixed-methods case study synthesising 864+ social posts and 37 job descriptions; consulting research on Australia's online-health sector; and market briefs I write for fun.</p>
+        <div class="k">How I used AI</div><p class="v">AI as a research accelerant and thinking partner — but the thesis, structure and judgment are mine. I always end with an adversarial “real risks, no softening” section.</p>
+      </div>
+      <blockquote class="quote">
+        “Priced for perfection: ~110× price-to-sales — 15× Alphabet's. The story is AI + space + Starlink; the maths isn't cheap.”
+        <span>From a self-initiated SpaceX-IPO brief · translated from the original</span>
+      </blockquote>
+    </div>
+
+    <div class="proj">
+      <h3>Tooling I built when it didn't exist</h3>
+      <p class="what">When a workflow I need isn't there, I build it.</p>
+      <div class="rows">
+        <div class="k">Friday</div><p class="v">A Telegram bot that lets me drive my desktop AI from my phone — kick off research or drafting from anywhere. Self-healing: a watchdog restarts it if it drops.</p>
+        <div class="k">XHS Conductor</div><p class="v">A one-command research skill over Xiaohongshu (China's biggest discovery platform), with fast and deep modes — it expands keywords, captures posts, and writes a synthesis to my notes.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="seclabel"><span class="mono num">02</span><span class="mono">If I started Monday</span></div>
+    <h2>Three workflows I'd build for the CEO office in week one</h2>
+    <p class="lede">Tuned to AMBC — a national peak body working across government, ASX-listed members, scale-ups and universities.</p>
+    <div class="wk">
+      <div class="item">
+        <div>
+          <h3>Member &amp; policy intelligence brief</h3>
+          <p><b>Auto-track ASX announcements, federal/state critical-minerals policy and funding rounds, and member-company news → one tight weekly brief, plus ad-hoc alerts.</b> I already run monitors like this; pointing them at the battery and critical-minerals beat is a config change, not a rebuild.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div>
+          <h3>CEO inputs → finished outputs</h3>
+          <p><b>A workflow that turns voice notes and rough dot points into drafted emails, LinkedIn posts, newsletter sections and member briefs — in the house voice.</b> “Messy input → structured output” is the thing I do most.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div>
+          <h3>Comms &amp; newsletter pipeline</h3>
+          <p><b>Research → draft → your review, on a repeatable cadence</b>, so the content engine keeps running whether or not it's a busy week — with a human (me) on the final read every time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="ainote">
+      <h2>How I used AI on this page</h2>
+      <p><b>I built this with Claude Code in well under an hour.</b> It read my project files, drafted the copy with me, and deployed it to GitHub Pages. That's the honest answer to “how do you use AI?” — not as a magic box, but as the instrument I reach for first. This page is a small live example of it.</p>
+    </div>
+  </section>
+
+  <footer>
+    Max Huang · <a href="mailto:huangmmax@gmail.com">huangmmax@gmail.com</a> · Brisbane, relocating to China (fully remote · ~2h ahead of China time) · <a href="https://github.com/maxi-max-dev">github.com/maxi-max-dev</a>
+  </footer>
+
+</div>
+</body>
+</html>
