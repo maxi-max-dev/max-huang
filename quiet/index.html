@@ -1,0 +1,2026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiet — Find a study spot at UQ</title>
+  <style>
+    :root {
+      --uq-purple: #51247a;
+      --uq-light: #f4f1f8;
+      --bg: #faf9fc;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --muted: #6b6b7a;
+      --border: #e8e6ee;
+      --green: #10b981;
+      --gold: #f59e0b;
+      --tomato: #e63946;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.4;
+    }
+    header {
+      background: var(--uq-purple);
+      color: white;
+      padding: 24px 20px 16px;
+    }
+    header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+    header p { margin-top: 4px; opacity: 0.85; font-size: 14px; }
+    .stats-strip {
+      display: flex;
+      gap: 14px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      flex-wrap: wrap;
+      font-size: 12px;
+    }
+    .stats-strip .stat { display: flex; align-items: center; gap: 4px; }
+    .stats-strip strong { font-weight: 700; font-size: 13px; }
+    main { max-width: 800px; margin: 0 auto; padding: 16px; padding-bottom: 100px; }
+    .footnote {
+      background: #fffbe5;
+      border: 1px solid #fde68a;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 11px;
+      color: #78350f;
+      line-height: 1.4;
+    }
+    /* Sticky heatmap-like compare bar */
+    .compare-bar-wrapper {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--bg);
+      padding: 8px 0;
+      margin: 0 -16px 12px;
+      padding-left: 16px;
+      padding-right: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .compare-bar-label {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .compare-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .compare-bar::-webkit-scrollbar { height: 4px; }
+    .compare-bar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .comp-chip {
+      flex: 0 0 auto;
+      min-width: 110px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left-width: 3px;
+      border-radius: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .comp-chip:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(81, 36, 122, 0.15); }
+    .comp-chip-name {
+      font-weight: 600;
+      font-size: 11px;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 110px;
+    }
+    .comp-chip-row { display: flex; gap: 6px; align-items: center; font-size: 10px; color: var(--muted); }
+    .comp-chip-emoji { font-size: 14px; line-height: 1; }
+    .controls {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .controls button {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--text);
+    }
+    .controls button:hover { border-color: var(--uq-purple); color: var(--uq-purple); }
+    .controls button.active {
+      background: var(--uq-purple);
+      color: white;
+      border-color: var(--uq-purple);
+    }
+    .controls .group-divider { width: 1px; background: var(--border); margin: 0 4px; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 640px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      transition: box-shadow 0.15s;
+      position: relative;
+      scroll-margin-top: 80px;
+    }
+    .card:hover { box-shadow: 0 4px 12px rgba(81, 36, 122, 0.08); }
+    .card.favorited { box-shadow: 0 0 0 2px var(--gold); }
+    .card.scroll-target { animation: highlight 0.8s ease; }
+    @keyframes highlight {
+      0% { box-shadow: 0 0 0 4px var(--uq-purple); }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+    .card.pomo-running { box-shadow: 0 0 0 2px var(--tomato); }
+    .fav-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      line-height: 1;
+      opacity: 0.4;
+      transition: opacity 0.15s, transform 0.15s;
+      z-index: 2;
+    }
+    .fav-btn:hover { opacity: 1; transform: scale(1.15); }
+    .fav-btn.active { opacity: 1; }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 8px;
+      padding-right: 28px;
+    }
+    .card h2 { font-size: 15px; font-weight: 600; line-height: 1.3; }
+    .campus-tag {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    .meta-line {
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .noise-tag {
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .noise-silent   { background: #1e293b; color: white; }
+    .noise-quiet    { background: #d1fae5; color: #065f46; }
+    .noise-moderate { background: #fef3c7; color: #92400e; }
+    .noise-lively   { background: #fed7aa; color: #9a3412; }
+    .quiet-note { font-size: 10px; color: var(--muted); font-style: italic; }
+    .hours-line {
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    /* The heatmap part — Vemcount widget always shown, lazy loaded */
+    .vemcount-inline {
+      margin: 6px -4px 6px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #f8f8fa;
+      min-height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .vemcount-inline iframe {
+      width: 100%;
+      height: 160px;
+      border: none;
+      display: block;
+    }
+    .vemcount-loading { color: var(--muted); font-size: 11px; }
+    .quick-line {
+      font-size: 12px;
+      padding: 6px 10px;
+      background: var(--bg);
+      border-radius: 6px;
+      text-align: center;
+      margin-bottom: 8px;
+      color: var(--muted);
+    }
+    .quick-line strong { color: var(--text); font-weight: 600; }
+    .quick-line .pill {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-right: 4px;
+    }
+    .quick-line .pill-quiet { background: #d1fae5; color: #065f46; }
+    .quick-line .pill-ok { background: #fef3c7; color: #92400e; }
+    .quick-line .pill-crowded { background: #fee2e2; color: #991b1b; }
+    .checkin-btn {
+      width: 100%;
+      background: var(--uq-purple);
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.15s;
+    }
+    .checkin-btn:hover { background: #3f1c5e; }
+    .checkin-btn:active { transform: scale(0.98); }
+    .checkin-btn.checked-in { background: var(--green); }
+    .expand-toggle {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--muted);
+      padding: 8px 0 0;
+      cursor: pointer;
+      font-size: 11px;
+      transition: color 0.15s;
+      margin-top: 6px;
+    }
+    .expand-toggle:hover { color: var(--uq-purple); }
+    .card-details {
+      display: none;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border);
+    }
+    .card.expanded .card-details { display: block; }
+    .card.expanded .expand-toggle { color: var(--uq-purple); }
+
+    /* Detail-only sections */
+    .facilities {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+      margin-bottom: 10px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .facilities span { white-space: nowrap; }
+    .mayor-line {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      background: linear-gradient(90deg, #fff8e7 0%, transparent 100%);
+      border-left: 2px solid var(--gold);
+      border-radius: 0 4px 4px 0;
+    }
+    .floor-guide {
+      margin: 0 0 12px;
+      padding: 8px 10px;
+      background: #f8f7fb;
+      border-left: 2px solid var(--uq-purple);
+      border-radius: 0 6px 6px 0;
+    }
+    .floor-guide-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--uq-purple);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .floor-list { display: flex; flex-direction: column; gap: 4px; }
+    .floor-row {
+      display: grid;
+      grid-template-columns: 32px 56px 1fr;
+      gap: 6px;
+      align-items: center;
+      font-size: 11.5px;
+      line-height: 1.45;
+    }
+    .floor-row .lvl {
+      font-weight: 600;
+      color: var(--uq-purple);
+      background: #fff;
+      border: 1px solid #e3dcef;
+      border-radius: 4px;
+      text-align: center;
+      padding: 1px 0;
+      height: fit-content;
+    }
+    .floor-row .note { color: var(--text); }
+    .floor-row .floor-noise {
+      font-size: 8.5px;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      text-align: center;
+      height: fit-content;
+    }
+    .floor-row .floor-noise.empty { background: transparent; color: var(--muted); font-style: italic; text-transform: none; letter-spacing: 0; opacity: 0.5; }
+    .floor-guide-sub { font-weight: 400; color: var(--muted); font-size: 10px; margin-left: 2px; }
+    .floor-item { padding: 3px 0; }
+    .floor-item + .floor-item { border-top: 1px dashed rgba(81, 36, 122, 0.08); }
+    .floor-vote {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 3px;
+      padding-left: 38px;
+      flex-wrap: wrap;
+    }
+    .floor-vote-btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 10px;
+      padding: 1px 7px;
+      font-size: 10.5px;
+      line-height: 1.3;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      color: var(--text);
+    }
+    .floor-vote-btn:hover { background: var(--uq-light); border-color: #c8b9de; }
+    .floor-vote-btn.mine { background: var(--uq-purple); color: white; border-color: var(--uq-purple); font-weight: 600; }
+    .floor-here-btn {
+      border: 1px solid #c4b5fd;
+      background: #ede9fe;
+      color: var(--uq-purple);
+      border-radius: 10px;
+      padding: 1px 7px;
+      font-size: 10.5px;
+      line-height: 1.3;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      font-weight: 600;
+      margin-left: 2px;
+    }
+    .floor-here-btn:hover { background: #ddd6fe; }
+    .floor-here-btn.mine { background: var(--green); color: white; border-color: var(--green); }
+    .floor-vote-tally { font-size: 9.5px; color: var(--muted); margin-left: 4px; font-style: italic; }
+    .floor-vote-clear {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+      line-height: 1;
+      padding: 0 4px;
+      margin-left: auto;
+    }
+    .floor-vote-clear:hover { color: var(--tomato); }
+    .student-tips {
+      margin: 0 0 12px;
+      padding: 7px 10px;
+      background: #fff7ed;
+      border-left: 2px solid #fb923c;
+      border-radius: 0 6px 6px 0;
+      font-size: 11.5px;
+      color: #7c2d12;
+      line-height: 1.5;
+    }
+    .student-tips .tip-text { font-style: italic; }
+    .student-tips .tip-source {
+      display: block;
+      margin-top: 3px;
+      font-size: 10px;
+      color: #9a3412;
+      font-style: normal;
+    }
+    .mayor-line strong { color: #92400e; font-weight: 600; }
+    .mayor-line.you strong { color: var(--gold); }
+    .map-toggle {
+      width: 100%;
+      background: none;
+      border: 1px dashed var(--border);
+      color: var(--muted);
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      margin-bottom: 10px;
+      transition: all 0.15s;
+    }
+    .map-toggle:hover { background: var(--uq-light); color: var(--uq-purple); border-color: var(--uq-purple); }
+    .map-toggle.active { background: var(--uq-light); color: var(--uq-purple); border-style: solid; border-color: var(--uq-purple); }
+    .map-frame {
+      display: none;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .map-frame.active { display: block; }
+    .map-frame iframe { width: 100%; height: 220px; border: none; display: block; }
+    .gps-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .gps-btn {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--uq-purple);
+      color: var(--uq-purple);
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .gps-btn:hover { background: var(--uq-light); }
+    .gps-btn.verified { background: var(--green); color: white; border-color: var(--green); }
+    .gps-msg {
+      font-size: 11px;
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .gps-msg.success { background: #d1fae5; color: #065f46; }
+    .gps-msg.fail { background: #fee2e2; color: #991b1b; }
+    /* Pomodoro */
+    .pomo-section {
+      margin: 10px 0;
+      padding: 10px;
+      background: linear-gradient(135deg, #fff5f5 0%, #ffe8e0 100%);
+      border-radius: 8px;
+      border: 1px solid #fecaca;
+    }
+    .pomo-label {
+      font-size: 11px;
+      color: #9a3412;
+      font-weight: 600;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .pomo-buttons { display: flex; gap: 6px; }
+    .pomo-btn {
+      flex: 1;
+      background: white;
+      border: 1px solid #fca5a5;
+      color: var(--tomato);
+      padding: 8px 4px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .pomo-btn:hover { background: var(--tomato); color: white; }
+    .pomo-active { text-align: center; }
+    .pomo-countdown {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--tomato);
+      font-variant-numeric: tabular-nums;
+      margin: 6px 0;
+    }
+    .pomo-actions { display: flex; gap: 6px; justify-content: center; }
+    .pomo-actions button {
+      background: white;
+      border: 1px solid var(--tomato);
+      color: var(--tomato);
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .pomo-actions button.primary { background: var(--tomato); color: white; }
+    .pomo-warning {
+      font-size: 11px;
+      color: #92400e;
+      background: #fffbe5;
+      padding: 6px 10px;
+      border-radius: 4px;
+      margin-top: 6px;
+      text-align: center;
+    }
+    /* Postcard styles */
+    .postcard-section {
+      margin-top: 10px;
+      padding: 10px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .postcard-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .postcard-mini {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      background: white;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+    .postcard-mini.unlocked { border-color: var(--gold); background: linear-gradient(135deg, #fff8e7, white); }
+    .postcard-mini-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+      background: var(--border);
+      color: var(--muted);
+    }
+    .postcard-mini-thumb.unlocked { background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; }
+    .postcard-mini-text { flex: 1; font-size: 12px; }
+    .postcard-mini-text strong { display: block; font-size: 13px; margin-bottom: 2px; }
+    .postcard-progress {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .postcard-progress > span {
+      display: block;
+      height: 100%;
+      background: var(--gold);
+    }
+    /* Postcard collection modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 16px;
+      overflow-y: auto;
+    }
+    .modal-backdrop.active { display: flex; }
+    .modal {
+      background: var(--bg);
+      border-radius: 12px;
+      max-width: 700px;
+      width: 100%;
+      padding: 24px;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 22px;
+      color: var(--muted);
+      line-height: 1;
+      padding: 6px;
+    }
+    .modal h2 { color: var(--uq-purple); margin-bottom: 4px; }
+    .modal .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+    .postcard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 640px) { .postcard-grid { grid-template-columns: 1fr 1fr 1fr; } }
+    .postcard-full {
+      aspect-ratio: 3 / 4;
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: white;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    .postcard-full.locked {
+      background: linear-gradient(135deg, #d1d5db, #9ca3af);
+      filter: grayscale(0.6);
+    }
+    .postcard-full .pc-emoji { font-size: 48px; text-align: center; }
+    .postcard-full .pc-name { font-size: 13px; font-weight: 700; text-align: center; line-height: 1.2; }
+    .postcard-full .pc-campus { font-size: 10px; opacity: 0.85; text-align: center; }
+    .postcard-full .pc-status { font-size: 10px; text-align: center; padding: 4px 6px; background: rgba(255,255,255,0.2); border-radius: 4px; }
+    /* Floating bottom timer */
+    .pomo-floater {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--tomato);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 999px;
+      box-shadow: 0 4px 20px rgba(230, 57, 70, 0.4);
+      display: none;
+      align-items: center;
+      gap: 14px;
+      z-index: 100;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .pomo-floater.active { display: flex; }
+    .pomo-floater .time {
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      font-size: 16px;
+    }
+    .pomo-floater button {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .pomo-floater button:hover { background: rgba(255,255,255,0.3); }
+    /* Status section (in details) */
+    .status-section { margin-top: 10px; }
+    .status-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .status-summary {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      background: var(--bg);
+      border-radius: 6px;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .status-summary strong { color: var(--uq-purple); font-weight: 600; }
+    .status-bar {
+      display: flex;
+      height: 4px;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 4px;
+      background: var(--border);
+    }
+    .status-bar > span { display: block; height: 100%; }
+    .status-bar .b-quiet { background: #10b981; }
+    .status-bar .b-ok { background: #f59e0b; }
+    .status-bar .b-crowded { background: #ef4444; }
+    .status-row { display: flex; gap: 6px; }
+    .status-btn {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 8px 4px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      line-height: 1.2;
+    }
+    .status-btn:hover { border-color: var(--uq-purple); }
+    .status-btn .emoji { font-size: 18px; }
+    .status-btn .count { font-weight: 700; color: var(--uq-purple); font-size: 11px; }
+    .status-btn.user-pick { background: var(--uq-purple); color: white; border-color: var(--uq-purple); }
+    .status-btn.user-pick .count { color: white; }
+    .your-pick-line {
+      font-size: 11px;
+      color: var(--uq-purple);
+      font-weight: 500;
+      text-align: center;
+      margin-top: 6px;
+      min-height: 14px;
+    }
+    .uq-link {
+      display: inline-block;
+      font-size: 11px;
+      color: var(--muted);
+      text-decoration: underline;
+      margin-bottom: 10px;
+    }
+    section.rooms {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 24px;
+    }
+    section h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--uq-purple);
+    }
+    section p.section-desc { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+    .primary-btn {
+      display: inline-block;
+      background: var(--uq-purple);
+      color: white;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      transition: background 0.15s;
+    }
+    .primary-btn:hover { background: #3f1c5e; }
+    .secondary-btn {
+      display: inline-block;
+      background: white;
+      color: var(--uq-purple);
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      margin-left: 8px;
+      border: 1px solid var(--uq-purple);
+      transition: background 0.15s;
+    }
+    .secondary-btn:hover { background: var(--uq-light); }
+    details { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 12px; }
+    details summary { cursor: pointer; font-size: 13px; color: var(--muted); font-weight: 500; padding: 4px 0; }
+    details summary:hover { color: var(--uq-purple); }
+    .room-list { margin-top: 12px; display: grid; grid-template-columns: 1fr; gap: 6px; font-size: 13px; }
+    @media (min-width: 640px) { .room-list { grid-template-columns: 1fr 1fr; } }
+    .room-item {
+      padding: 8px 10px;
+      background: var(--bg);
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .room-item .room-name { font-weight: 500; }
+    .room-item .room-cap { font-size: 11px; color: var(--muted); white-space: nowrap; }
+    footer { text-align: center; padding: 32px 16px; color: var(--muted); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Quiet</h1>
+    <p>Where's it crowded right now?</p>
+    <div class="stats-strip" id="stats-strip"></div>
+  </header>
+
+  <main>
+    <div class="footnote">
+      🚧 <strong>v0.8.2 local prototype.</strong> Live occupancy = real UQ sensor data. Floor check-ins and votes are stored in your browser only — multi-user sync next. (Pomodoro + postcards temporarily hidden to focus the prototype.)
+    </div>
+
+    <div class="compare-bar-wrapper">
+      <div class="compare-bar-label">⚡ At a glance — tap a chip to jump</div>
+      <div class="compare-bar" id="compare-bar"></div>
+    </div>
+
+    <div class="controls">
+      <button id="filter-quiet">🤫 Quiet only</button>
+      <button id="filter-fav">⭐ Favorites</button>
+      <span class="group-divider"></span>
+      <button id="filter-postgrad" title="Postgrad-only zones">🎓 Postgrad</button>
+      <button id="filter-booth" title="Has soundproof booth">🎧 Booth</button>
+      <button id="filter-kitchen" title="Has student kitchen">☕ Kitchen</button>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <section class="rooms">
+      <h2>📋 Bookable Study Rooms</h2>
+      <p class="section-desc">Reserve a soundproof booth, group room, or grab one of the exam-period overflow rooms across campus.</p>
+      <a class="primary-btn" href="https://uqbookit.uq.edu.au" target="_blank" rel="noopener">📅 Book a Room → UQ Book It</a>
+      <a class="secondary-btn" href="https://life.uq.edu.au/study-spaces" target="_blank" rel="noopener">📍 More Spaces → UQ Life</a>
+      <details>
+        <summary>14+ reserved overflow rooms across St Lucia (exam periods, 7am–10pm)</summary>
+        <div class="room-list" id="room-list"></div>
+      </details>
+    </section>
+  </main>
+
+  <div class="pomo-floater" id="pomo-floater">
+    <span>🍅 <strong id="floater-lib"></strong></span>
+    <span class="time" id="floater-time">25:00</span>
+    <button id="floater-stop">Stop</button>
+  </div>
+
+  <!-- Postcard collection modal -->
+  <div class="modal-backdrop" id="postcard-modal">
+    <div class="modal">
+      <button class="modal-close" id="modal-close">×</button>
+      <h2>🖼️ Postcard Collection</h2>
+      <p class="modal-sub">Earn one postcard per library by completing 2 hours of focus sessions there. Show off your favourite study spots.</p>
+      <div class="postcard-grid"></div>
+    </div>
+  </div>
+
+  <footer>
+    Built with ❤️ by a UQ student · v0.8.2 local
+  </footer>
+
+  <script>
+    const STD_HOURS = "Mon–Fri 7am–10pm · Sat–Sun 7am–6pm";
+
+    const LIBRARIES = [
+      { id: "duhig", name: "Duhig Tower", campus: "St Lucia",
+        noise: "quiet", quietNote: "L4–5 postgrad-only quietest", hours: STD_HOURS,
+        lat: -27.4969, lng: 153.0140,
+        facilities: { seats: 320, floors: "5", booth1: false, booth2: false, group: true, postgrad: true, lowLight: true, kitchen: true, special: "Fryer Library + Reading Room" },
+        floorGuide: [
+          { label: "L5", note: "Postgrad-friendly individual study",                       noise: "quiet" },
+          { label: "L4", note: "Postgrad-friendly individual study",                       noise: "quiet" },
+          { label: "L3", note: "General/group; connects across to Duhig North",            noise: "moderate" },
+          { label: "L2", note: "General study; Fryer reading room area",                   noise: "quiet" },
+          { label: "L1", note: "Connection to Central Library; returns",                   noise: "moderate" },
+        ],
+        studentTips: [
+          { text: "I just go for Duhig L5 and work my way down the levels if I don't find a seat.", source: "r/UQreddit · May 2026" },
+        ],
+        widget: "ExE6GxrFFaMwRXn",
+        uq: "https://web.library.uq.edu.au/visit/duhig-tower",
+        mapsEmbed: "https://maps.google.com/maps?q=Duhig+Tower+UQ+St+Lucia&output=embed",
+        postcard: { emoji: "🏛️", gradient: "linear-gradient(135deg, #51247a 0%, #7c3aed 100%)" } },
+      { id: "central", name: "Central Library", campus: "St Lucia",
+        noise: "moderate", quietNote: "L3 low-light · L4 postgrad", hours: STD_HOURS,
+        lat: -27.4974, lng: 153.0155,
+        facilities: { seats: 1100, floors: "4", booth1: true, booth2: true, group: true, postgrad: true, lowLight: true, kitchen: true, special: "Exam booths · Presentation room (N206)" },
+        floorGuide: [
+          { label: "L4", note: "Postgrad-friendly; popular for the view",      noise: "quiet" },
+          { label: "L3", note: "Low-light individual study (quieter feel)",    noise: "quiet" },
+          { label: "L2", note: "General individual + group study",             noise: "moderate" },
+          { label: "L1", note: "Returns desk, high-use shelves, entrance",     noise: "moderate" },
+        ],
+        studentTips: [
+          { text: "Central Library L4 — that's the only floor I can even find a seat, if I do.", source: "r/UQreddit · May 2026" },
+        ],
+        widget: "llhVuvsEcZkfFp6",
+        uq: "https://web.library.uq.edu.au/visit/central-library",
+        mapsEmbed: "https://maps.google.com/maps?q=Central+Library+UQ+St+Lucia&output=embed",
+        postcard: { emoji: "📚", gradient: "linear-gradient(135deg, #4338ca 0%, #6366f1 100%)" } },
+      { id: "law", name: "Walter Harrison Law", campus: "St Lucia",
+        noise: "silent", quietNote: "Silent throughout", hours: STD_HOURS,
+        lat: -27.4956, lng: 153.0124,
+        facilities: { seats: 196, floors: "3 (L2–4)", booth1: false, booth2: false, group: true, postgrad: false, lowLight: true, kitchen: true, special: "Training room" },
+        floorGuide: [
+          { label: "L4", note: "Silent individual study",                 noise: "silent" },
+          { label: "L3", note: "Silent individual + group study",         noise: "silent" },
+          { label: "L2", note: "Returns shelf; silent individual study",  noise: "silent" },
+        ],
+        widget: "9UIeKo2EiDqmWZh",
+        uq: "https://web.library.uq.edu.au/visit/walter-harrison-law-library",
+        mapsEmbed: "https://maps.google.com/maps?q=Walter+Harrison+Law+Library+UQ+St+Lucia&output=embed",
+        postcard: { emoji: "⚖️", gradient: "linear-gradient(135deg, #1e293b 0%, #334155 100%)" } },
+      { id: "arch-music", name: "Architecture and Music", campus: "St Lucia",
+        noise: "quiet", quietNote: "Single floor — L3 of Zelman Cowen", hours: STD_HOURS,
+        lat: -27.4978, lng: 153.0143,
+        facilities: { seats: 151, floors: "1 (L3)", booth1: false, booth2: false, group: true, postgrad: false, lowLight: false, kitchen: false, special: "Visualization Lab · Audio listening" },
+        floorGuide: [
+          { label: "L3", note: "Whole library on one level — group + individual; visualisation lab; audio listening area", noise: "quiet" },
+        ],
+        widget: "NARfJiWCiIEMU2C",
+        uq: "https://web.library.uq.edu.au/visit/architecture-and-music-library",
+        mapsEmbed: "https://maps.google.com/maps?q=Zelman+Cowen+Building+UQ+St+Lucia&output=embed",
+        postcard: { emoji: "🎼", gradient: "linear-gradient(135deg, #be185d 0%, #ec4899 100%)" } },
+      { id: "bio", name: "Biological Sciences", campus: "St Lucia",
+        noise: "quiet", quietNote: "L4 postgrad-only", hours: STD_HOURS,
+        lat: -27.4979, lng: 153.0157,
+        facilities: { seats: null, floors: "4", booth1: true, booth2: true, group: true, postgrad: true, lowLight: false, kitchen: true, special: "Energy pods · Anatomical models" },
+        floorGuide: [
+          { label: "L4", note: "Postgrad-only quiet study",                              noise: "quiet" },
+          { label: "L3", note: "Quiet individual study (try here first per student tip)", noise: "quiet" },
+          { label: "L2", note: "Group + individual study; booths",                       noise: "moderate" },
+          { label: "L1", note: "Entrance, anatomical models, energy pods",               noise: "moderate" },
+        ],
+        studentTips: [
+          { text: "Biosciences higher floors — that's where I can find a seat.", source: "r/UQreddit · May 2026" },
+        ],
+        widget: "UuuILxkDQl4dcPD",
+        uq: "https://web.library.uq.edu.au/visit/biological-sciences-library",
+        mapsEmbed: "https://maps.google.com/maps?q=Biological+Sciences+Library+UQ+St+Lucia&output=embed",
+        postcard: { emoji: "🌱", gradient: "linear-gradient(135deg, #047857 0%, #10b981 100%)" } },
+      { id: "dorothy", name: "Dorothy Hill Engineering & Sciences", campus: "St Lucia",
+        noise: "moderate", quietNote: "L3 low-light is quieter", hours: STD_HOURS,
+        lat: -27.4994, lng: 153.0145,
+        facilities: { seats: 401, floors: "2 (L2–3)", booth1: true, booth2: false, group: true, postgrad: false, lowLight: true, kitchen: true, special: null },
+        floorGuide: [
+          { label: "L3", note: "Individual + group + low-light; requested items pickup",  noise: "quiet" },
+          { label: "L2", note: "Individual + group + low-light; High Use collection",     noise: "moderate" },
+        ],
+        widget: "A6BTYMUAv0bkuPz",
+        uq: "https://web.library.uq.edu.au/visit/dorothy-hill-engineering-and-sciences-library",
+        mapsEmbed: "https://maps.google.com/maps?q=Hawken+Engineering+Building+UQ+St+Lucia&output=embed",
+        postcard: { emoji: "⚙️", gradient: "linear-gradient(135deg, #ea580c 0%, #f97316 100%)" } },
+      { id: "dutton", name: "Dutton Park Health Sciences", campus: "Dutton Park",
+        noise: "quiet", quietNote: "Level 6, Susan Tett Building", hours: STD_HOURS,
+        lat: -27.5005, lng: 153.0290,
+        facilities: { seats: 112, floors: "1 (L6)", booth1: true, booth2: false, group: true, postgrad: false, lowLight: false, kitchen: false, special: "Laptop locker" },
+        widget: "dztSRSIv8LDEXlx",
+        uq: "https://web.library.uq.edu.au/visit/dutton-park-health-sciences-library",
+        mapsEmbed: "https://maps.google.com/maps?q=Susan+Tett+Building+UQ+Woolloongabba&output=embed",
+        postcard: { emoji: "🩺", gradient: "linear-gradient(135deg, #b45309 0%, #f59e0b 100%)" } },
+      { id: "herston", name: "Herston Health Sciences", campus: "Herston",
+        noise: "quiet", quietNote: "Level 6, Block 6, RBWH", hours: STD_HOURS,
+        lat: -27.4471, lng: 153.0287,
+        facilities: { seats: 70, floors: "1 (L6)", booth1: false, booth2: true, group: true, postgrad: false, lowLight: false, kitchen: false, special: null },
+        widget: "slcqVYGO7KAanHG",
+        uq: "https://web.library.uq.edu.au/visit/herston-health-sciences-library",
+        mapsEmbed: "https://maps.google.com/maps?q=Herston+Health+Sciences+Library+UQ&output=embed",
+        postcard: { emoji: "🏥", gradient: "linear-gradient(135deg, #b91c1c 0%, #ef4444 100%)" } },
+      { id: "gatton", name: "JK Murray (UQ Gatton)", campus: "Gatton",
+        noise: "quiet", quietNote: "Largest non-CBD campus library", hours: STD_HOURS,
+        lat: -27.5546, lng: 152.3433,
+        facilities: { seats: 570, floors: "2", booth1: true, booth2: false, group: true, postgrad: false, lowLight: false, kitchen: true, special: "Energy pod · Assistive tech rooms" },
+        widget: "OJomdqXih0jqc2b",
+        uq: "https://web.library.uq.edu.au/visit/jk-murray-library-uq-gatton",
+        mapsEmbed: "https://maps.google.com/maps?q=JK+Murray+Library+UQ+Gatton&output=embed",
+        postcard: { emoji: "🌾", gradient: "linear-gradient(135deg, #65a30d 0%, #84cc16 100%)" } },
+    ];
+
+    // Feature flag: gamification surface (pomodoro / postcards / focus-stats / floater)
+    // false = hide all gamification, keep the prototype focused on heatmap + floor signals.
+    // Flip to true to bring it back; underlying functions remain intact.
+    const SHOW_GAMIFICATION = false;
+
+    // Postcard unlock threshold: 2 hours of completed pomodoro at this library
+    const POSTCARD_UNLOCK_MS = 2 * 60 * 60 * 1000;
+
+    const ROOMS = [
+      { name: "01-E219", building: "Forgan Smith", capacity: 24 },
+      { name: "01-E348", building: "Forgan Smith", capacity: 15 },
+      { name: "01-W426", building: "Forgan Smith", capacity: 40 },
+      { name: "01-W458", building: "Forgan Smith", capacity: 40 },
+      { name: "26A-128A", building: "Connell", capacity: 25 },
+      { name: "35-102", building: "Chamberlain", capacity: 25 },
+      { name: "35-103", building: "Chamberlain", capacity: 25 },
+      { name: "39-205", building: "Colin Clark", capacity: 30 },
+      { name: "39-208", building: "Colin Clark", capacity: 30 },
+      { name: "67-343", building: "Priestley", capacity: 42 },
+      { name: "67-348", building: "Priestley", capacity: 42 },
+      { name: "83-C310", building: "Hartley Teakle", capacity: 48 },
+      { name: "83-C511 to C516, S524", building: "Hartley Teakle", capacity: 24 },
+      { name: "84A-406", building: "Therapies Annexe", capacity: 24 },
+    ];
+
+    const CAMPUS_COLORS = {
+      "St Lucia":    { bg: "#f4f1f8", text: "#51247a" },
+      "Gatton":      { bg: "#e8f5e9", text: "#2e7d32" },
+      "Herston":     { bg: "#fce4e4", text: "#c62828" },
+      "Dutton Park": { bg: "#fff3e0", text: "#e65100" },
+    };
+
+    const STATUS_DISPLAY = {
+      quiet:   { emoji: "😌", label: "Quiet", pillClass: "pill-quiet" },
+      ok:      { emoji: "😐", label: "OK", pillClass: "pill-ok" },
+      crowded: { emoji: "😣", label: "Crowded", pillClass: "pill-crowded" },
+    };
+
+    // Storage
+    const STORE = {
+      checkins: "quiet_checkins_v1",
+      favorites: "quiet_favorites_v1",
+      status: "quiet_status_v2",
+      session: "quiet_session_id",
+      pomoActive: "quiet_pomo_active_v1",
+      pomoLog: "quiet_pomo_log_v1",
+      gpsVerified: "quiet_gps_verified_v1",
+      expanded: "quiet_expanded_v1",
+      floorVotes: "quiet_floor_votes_v1",
+      floorCheckins: "quiet_floor_checkins_v1",
+    };
+    function load(key, fb) { try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fb)); } catch(e) { return fb; } }
+    function save(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+    function getSessionId() {
+      let id = localStorage.getItem(STORE.session);
+      if (!id) {
+        id = "s_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+        localStorage.setItem(STORE.session, id);
+      }
+      return id;
+    }
+    const SESSION_ID = getSessionId();
+
+    // Check-ins / favorites / status / pomodoro / GPS — same as v0.5 logic
+    function recordCheckin(libId) {
+      const data = load(STORE.checkins, {});
+      data[libId] = data[libId] || [];
+      data[libId].push(Date.now());
+      const cutoff = Date.now() - 30 * 60 * 1000;
+      data[libId] = data[libId].filter(ts => ts > cutoff);
+      save(STORE.checkins, data);
+      return data[libId].length;
+    }
+    function countStudying(libId) {
+      const data = load(STORE.checkins, {});
+      const cutoff = Date.now() - 30 * 60 * 1000;
+      return (data[libId] || []).filter(ts => ts > cutoff).length;
+    }
+    function isFavorite(libId) { return load(STORE.favorites, []).includes(libId); }
+    function toggleFavorite(libId) {
+      let favs = load(STORE.favorites, []);
+      if (favs.includes(libId)) favs = favs.filter(id => id !== libId);
+      else favs.push(libId);
+      save(STORE.favorites, favs);
+      return favs.includes(libId);
+    }
+    function recordOrUpdateStatus(libId, status) {
+      const data = load(STORE.status, {});
+      data[libId] = data[libId] || [];
+      data[libId] = data[libId].filter(r => r.sessionId !== SESSION_ID);
+      const cutoff = Date.now() - 30 * 60 * 1000;
+      data[libId] = data[libId].filter(r => r.ts > cutoff);
+      data[libId].push({ sessionId: SESSION_ID, status, ts: Date.now() });
+      save(STORE.status, data);
+    }
+    function clearStatus(libId) {
+      const data = load(STORE.status, {});
+      if (!data[libId]) return;
+      data[libId] = data[libId].filter(r => r.sessionId !== SESSION_ID);
+      save(STORE.status, data);
+    }
+    function getStatusCounts(libId) {
+      const data = load(STORE.status, {});
+      const cutoff = Date.now() - 30 * 60 * 1000;
+      const reports = (data[libId] || []).filter(r => r.ts > cutoff);
+      const counts = { quiet: 0, ok: 0, crowded: 0 };
+      reports.forEach(r => { if (counts[r.status] !== undefined) counts[r.status]++; });
+      return counts;
+    }
+    function getMyStatusPick(libId) {
+      const data = load(STORE.status, {});
+      const cutoff = Date.now() - 30 * 60 * 1000;
+      const mine = (data[libId] || []).filter(r => r.ts > cutoff).find(r => r.sessionId === SESSION_ID);
+      if (!mine) return null;
+      return { status: mine.status, ageMin: Math.floor((Date.now() - mine.ts) / 60000) };
+    }
+    // Floor-level votes — 30-min decay, one vote per session per (lib, floor)
+    // Note: localStorage = single browser; counts are not multi-user until Phase 1 / Supabase.
+    function recordFloorVote(libId, label, vote) {
+      const data = load(STORE.floorVotes, {});
+      data[libId] = data[libId] || {};
+      const cutoff = Date.now() - 30 * 60 * 1000;
+      let arr = (data[libId][label] || []).filter(r => r.ts > cutoff && r.sessionId !== SESSION_ID);
+      arr.push({ sessionId: SESSION_ID, vote, ts: Date.now() });
+      data[libId][label] = arr;
+      save(STORE.floorVotes, data);
+    }
+    function clearFloorVote(libId, label) {
+      const data = load(STORE.floorVotes, {});
+      if (!data[libId] || !data[libId][label]) return;
+      data[libId][label] = data[libId][label].filter(r => r.sessionId !== SESSION_ID);
+      save(STORE.floorVotes, data);
+    }
+    function getFloorVoteSummary(libId, label) {
+      const data = load(STORE.floorVotes, {});
+      const cutoff = Date.now() - 30 * 60 * 1000;
+      const recent = ((data[libId] && data[libId][label]) || []).filter(r => r.ts > cutoff);
+      const c = { quiet: 0, ok: 0, loud: 0, total: recent.length, lastTs: 0 };
+      recent.forEach(r => {
+        if (c[r.vote] !== undefined) c[r.vote]++;
+        if (r.ts > c.lastTs) c.lastTs = r.ts;
+      });
+      return c;
+    }
+    function formatAgo(ts) {
+      if (!ts) return '';
+      const s = Math.floor((Date.now() - ts) / 1000);
+      if (s < 60) return 'just now';
+      const m = Math.floor(s / 60);
+      return `${m}m ago`;
+    }
+    function getMyFloorVote(libId, label) {
+      const data = load(STORE.floorVotes, {});
+      const cutoff = Date.now() - 30 * 60 * 1000;
+      const mine = ((data[libId] && data[libId][label]) || []).filter(r => r.ts > cutoff).find(r => r.sessionId === SESSION_ID);
+      if (!mine) return null;
+      return { vote: mine.vote, ageMin: Math.floor((Date.now() - mine.ts) / 60000) };
+    }
+    // Floor-level check-ins (drive-by "I'm at L5"). Also tickles library-level
+    // recordCheckin so the compare bar / quick-line count stays consistent.
+    function recordFloorCheckin(libId, label) {
+      const data = load(STORE.floorCheckins, {});
+      data[libId] = data[libId] || {};
+      const cutoff = Date.now() - 30 * 60 * 1000;
+      let arr = (data[libId][label] || []).filter(r => r.ts > cutoff && r.sessionId !== SESSION_ID);
+      arr.push({ sessionId: SESSION_ID, ts: Date.now() });
+      data[libId][label] = arr;
+      save(STORE.floorCheckins, data);
+      recordCheckin(libId);
+    }
+    function clearFloorCheckin(libId, label) {
+      const data = load(STORE.floorCheckins, {});
+      if (!data[libId] || !data[libId][label]) return;
+      data[libId][label] = data[libId][label].filter(r => r.sessionId !== SESSION_ID);
+      save(STORE.floorCheckins, data);
+    }
+    function countFloorCheckins(libId, label) {
+      const data = load(STORE.floorCheckins, {});
+      const cutoff = Date.now() - 30 * 60 * 1000;
+      return ((data[libId] && data[libId][label]) || []).filter(r => r.ts > cutoff).length;
+    }
+    function myFloorCheckin(libId, label) {
+      const data = load(STORE.floorCheckins, {});
+      const cutoff = Date.now() - 30 * 60 * 1000;
+      const mine = ((data[libId] && data[libId][label]) || []).filter(r => r.ts > cutoff).find(r => r.sessionId === SESSION_ID);
+      if (!mine) return null;
+      return { ts: mine.ts, ageMin: Math.floor((Date.now() - mine.ts) / 60000) };
+    }
+    function dominantStatus(libId) {
+      const counts = getStatusCounts(libId);
+      const total = counts.quiet + counts.ok + counts.crowded;
+      if (total === 0) return null;
+      const sorted = ['quiet', 'ok', 'crowded'].sort((a,b) => counts[b] - counts[a]);
+      return { status: sorted[0], count: counts[sorted[0]], total };
+    }
+    function statusSummaryHtml(libId) {
+      const counts = getStatusCounts(libId);
+      const total = counts.quiet + counts.ok + counts.crowded;
+      if (total === 0) return '';
+      const dom = dominantStatus(libId);
+      const pct = (s) => Math.round((counts[s] / total) * 100);
+      const dPct = pct(dom.status);
+      const d = STATUS_DISPLAY[dom.status];
+      return `
+        <div class="status-summary">
+          ${total} report${total > 1 ? 's' : ''} · <strong>${dPct}% say ${d.emoji} ${d.label}</strong>
+          <div class="status-bar">
+            <span class="b-quiet" style="width:${pct('quiet')}%"></span>
+            <span class="b-ok" style="width:${pct('ok')}%"></span>
+            <span class="b-crowded" style="width:${pct('crowded')}%"></span>
+          </div>
+        </div>
+      `;
+    }
+    function getActivePomo() {
+      const p = load(STORE.pomoActive, null);
+      if (!p) return null;
+      const elapsed = Date.now() - p.startTs;
+      if (elapsed >= p.durationMs) { completePomo(); return null; }
+      return { ...p, remainingMs: p.durationMs - elapsed };
+    }
+    function startPomo(libId, minutes) {
+      recordCheckin(libId);
+      save(STORE.pomoActive, {
+        libId, startTs: Date.now(), durationMs: minutes * 60 * 1000,
+        hiddenMs: 0, hiddenSince: null, offlineMs: 0, offlineSince: navigator.onLine ? null : Date.now(),
+      });
+    }
+    function getHiddenMsCurrent() {
+      // Update hiddenMs / offlineMs to "now" if currently in those states
+      const p = load(STORE.pomoActive, null);
+      if (!p) return { hiddenMs: 0, offlineMs: 0 };
+      let hidden = p.hiddenMs || 0;
+      if (p.hiddenSince) hidden += Date.now() - p.hiddenSince;
+      let offline = p.offlineMs || 0;
+      if (p.offlineSince) offline += Date.now() - p.offlineSince;
+      return { hiddenMs: hidden, offlineMs: offline };
+    }
+    function stopPomo() {
+      const p = load(STORE.pomoActive, null);
+      if (!p) return;
+      const m = getHiddenMsCurrent();
+      const log = load(STORE.pomoLog, []);
+      log.push({ sessionId: SESSION_ID, libId: p.libId, startTs: p.startTs, endTs: Date.now(),
+        durationMs: Date.now() - p.startTs, plannedMs: p.durationMs, completed: false,
+        hiddenMs: m.hiddenMs, offlineMs: m.offlineMs });
+      save(STORE.pomoLog, log);
+      localStorage.removeItem(STORE.pomoActive);
+    }
+    function completePomo() {
+      const p = load(STORE.pomoActive, null);
+      if (!p) return;
+      const m = getHiddenMsCurrent();
+      const hiddenPct = Math.round((m.hiddenMs / p.durationMs) * 100);
+      const log = load(STORE.pomoLog, []);
+      log.push({ sessionId: SESSION_ID, libId: p.libId, startTs: p.startTs, endTs: Date.now(),
+        durationMs: p.durationMs, plannedMs: p.durationMs, completed: true,
+        hiddenMs: m.hiddenMs, offlineMs: m.offlineMs });
+      save(STORE.pomoLog, log);
+      localStorage.removeItem(STORE.pomoActive);
+      try { if ("Notification" in window && Notification.permission === "granted") {
+        const lib = LIBRARIES.find(l=>l.id===p.libId);
+        new Notification("🍅 Focus session complete!", {
+          body: hiddenPct > 30
+            ? `${p.durationMs/60000}m logged at ${lib?.name || 'library'}, but tab was hidden ${hiddenPct}% of the time.`
+            : `Great job. ${p.durationMs/60000}m at ${lib?.name || 'your library'}.`
+        });
+      }} catch(e) {}
+    }
+
+    // Track visibility / network for current pomodoro
+    document.addEventListener('visibilitychange', () => {
+      const p = load(STORE.pomoActive, null);
+      if (!p) return;
+      if (document.hidden) {
+        if (!p.hiddenSince) { p.hiddenSince = Date.now(); save(STORE.pomoActive, p); }
+      } else {
+        if (p.hiddenSince) {
+          p.hiddenMs = (p.hiddenMs || 0) + (Date.now() - p.hiddenSince);
+          p.hiddenSince = null;
+          save(STORE.pomoActive, p);
+        }
+      }
+    });
+    window.addEventListener('offline', () => {
+      const p = load(STORE.pomoActive, null);
+      if (p && !p.offlineSince) { p.offlineSince = Date.now(); save(STORE.pomoActive, p); }
+    });
+    window.addEventListener('online', () => {
+      const p = load(STORE.pomoActive, null);
+      if (p && p.offlineSince) {
+        p.offlineMs = (p.offlineMs || 0) + (Date.now() - p.offlineSince);
+        p.offlineSince = null;
+        save(STORE.pomoActive, p);
+      }
+    });
+    function getStreak() {
+      const log = load(STORE.pomoLog, []).filter(s => s.completed);
+      if (!log.length) return 0;
+      const dates = new Set(log.map(s => new Date(s.endTs).toDateString()));
+      let streak = 0; let day = new Date();
+      while (dates.has(day.toDateString())) { streak++; day.setDate(day.getDate() - 1); }
+      if (streak === 0) {
+        day = new Date(); day.setDate(day.getDate() - 1);
+        while (dates.has(day.toDateString())) { streak++; day.setDate(day.getDate() - 1); }
+      }
+      return streak;
+    }
+    function getTotalStudyMs() { return load(STORE.pomoLog, []).filter(s => s.completed).reduce((a, s) => a + s.durationMs, 0); }
+    function formatHours(ms) {
+      const totalMin = Math.floor(ms / 60000);
+      const h = Math.floor(totalMin / 60); const m = totalMin % 60;
+      return h === 0 ? `${m}m` : `${h}h ${m}m`;
+    }
+    function getMayor(libId) {
+      const log = load(STORE.pomoLog, []);
+      const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      const sessions = log.filter(s => s.libId === libId && s.completed && s.endTs > cutoff);
+      if (!sessions.length) return null;
+      const bySession = {};
+      sessions.forEach(s => { bySession[s.sessionId] = (bySession[s.sessionId] || 0) + s.durationMs; });
+      const top = Object.entries(bySession).sort((a,b) => b[1] - a[1])[0];
+      return { sessionId: top[0], minutes: Math.floor(top[1] / 60000), isYou: top[0] === SESSION_ID };
+    }
+    function getMayorshipsCount() {
+      let c = 0;
+      LIBRARIES.forEach(lib => { const m = getMayor(lib.id); if (m && m.isYou) c++; });
+      return c;
+    }
+
+    // ============ Postcards ============
+    // Total completed-pomo time spent at this library (all-time, your session only)
+    function getMyMsAtLib(libId) {
+      const log = load(STORE.pomoLog, []);
+      return log
+        .filter(s => s.libId === libId && s.completed && s.sessionId === SESSION_ID)
+        .reduce((acc, s) => acc + s.durationMs, 0);
+    }
+    function getPostcardProgress(libId) {
+      const ms = getMyMsAtLib(libId);
+      const pct = Math.min(100, Math.round((ms / POSTCARD_UNLOCK_MS) * 100));
+      const unlocked = ms >= POSTCARD_UNLOCK_MS;
+      return { ms, pct, unlocked, neededMs: POSTCARD_UNLOCK_MS - ms };
+    }
+    function getUnlockedPostcardCount() {
+      return LIBRARIES.filter(lib => getPostcardProgress(lib.id).unlocked).length;
+    }
+    function haversine(lat1, lng1, lat2, lng2) {
+      const R = 6371000; const toRad = d => d * Math.PI / 180;
+      const dLat = toRad(lat2 - lat1); const dLng = toRad(lng2 - lng1);
+      const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2)**2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+    function verifyGPS(libId, callback) {
+      if (!navigator.geolocation) return callback({ ok: false, reason: 'GPS not supported' });
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const lib = LIBRARIES.find(l => l.id === libId);
+          const dist = Math.round(haversine(pos.coords.latitude, pos.coords.longitude, lib.lat, lib.lng));
+          if (dist <= 200) {
+            const v = load(STORE.gpsVerified, {});
+            v[libId] = { ts: Date.now(), distance: dist };
+            save(STORE.gpsVerified, v);
+            callback({ ok: true, distance: dist });
+          } else {
+            callback({ ok: false, distance: dist, reason: 'too far' });
+          }
+        },
+        err => callback({ ok: false, reason: err.message }),
+        { timeout: 10000, enableHighAccuracy: true }
+      );
+    }
+    function getRecentGpsVerified(libId) {
+      const v = load(STORE.gpsVerified, {});
+      const r = v[libId];
+      return r && (Date.now() - r.ts) < 60 * 60 * 1000;
+    }
+
+    // Expanded state per card (persisted across reloads)
+    function isExpanded(libId) { return load(STORE.expanded, []).includes(libId); }
+    function toggleExpanded(libId) {
+      let arr = load(STORE.expanded, []);
+      if (arr.includes(libId)) arr = arr.filter(id => id !== libId);
+      else arr.push(libId);
+      save(STORE.expanded, arr);
+      return arr.includes(libId);
+    }
+
+    function sortedLibraries() {
+      return [...LIBRARIES].sort((a, b) => {
+        const af = isFavorite(a.id) ? 1 : 0;
+        const bf = isFavorite(b.id) ? 1 : 0;
+        return bf - af;
+      });
+    }
+
+    function renderCompareBar() {
+      const bar = document.getElementById("compare-bar");
+      bar.innerHTML = sortedLibraries().map(lib => {
+        const c = CAMPUS_COLORS[lib.campus] || CAMPUS_COLORS["St Lucia"];
+        const dom = dominantStatus(lib.id);
+        const checkins = countStudying(lib.id);
+        const emoji = dom ? STATUS_DISPLAY[dom.status].emoji : '—';
+        const sub = dom
+          ? `${dom.count}/${dom.total} say ${STATUS_DISPLAY[dom.status].label}`
+          : (checkins > 0 ? `${checkins} here` : 'no reports');
+        return `
+          <div class="comp-chip" style="border-left-color: ${c.text}" data-lib="${lib.id}">
+            <div class="comp-chip-name">${lib.name.replace(' Library', '').replace(' Engineering & Sciences', '')}</div>
+            <div class="comp-chip-row">
+              <span class="comp-chip-emoji">${emoji}</span>
+              <span>${sub}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+      bar.querySelectorAll('.comp-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const card = document.querySelector(`.card[data-id="${chip.dataset.lib}"]`);
+          if (card) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            card.classList.add('scroll-target');
+            setTimeout(() => card.classList.remove('scroll-target'), 800);
+          }
+        });
+      });
+    }
+
+    function renderStatsStrip() {
+      const strip = document.getElementById("stats-strip");
+      if (!SHOW_GAMIFICATION) { strip.style.display = 'none'; strip.innerHTML = ''; return; }
+      const streak = getStreak();
+      const total = getTotalStudyMs();
+      const mayorships = getMayorshipsCount();
+      const postcards = getUnlockedPostcardCount();
+      if (streak === 0 && total === 0) {
+        strip.innerHTML = '<span class="stat" style="opacity:0.7">Start a focus session to begin your streak →</span>';
+        return;
+      }
+      strip.innerHTML = `
+        <span class="stat">🔥 <strong>${streak}</strong> day streak</span>
+        <span class="stat">🍅 <strong>${formatHours(total)}</strong> total</span>
+        <span class="stat">👑 <strong>${mayorships}</strong> mayorships</span>
+        <span class="stat" id="open-postcards" style="cursor:pointer;text-decoration:underline">🖼️ <strong>${postcards}</strong>/9 postcards</span>
+      `;
+      const opener = document.getElementById('open-postcards');
+      if (opener) opener.addEventListener('click', openPostcardModal);
+    }
+
+    function openPostcardModal() {
+      const modal = document.getElementById('postcard-modal');
+      const grid = modal.querySelector('.postcard-grid');
+      grid.innerHTML = LIBRARIES.map(lib => {
+        const p = getPostcardProgress(lib.id);
+        const remainingMin = Math.ceil(p.neededMs / 60000);
+        if (p.unlocked) {
+          return `<div class="postcard-full" style="background:${lib.postcard.gradient}">
+            <div class="pc-emoji">${lib.postcard.emoji}</div>
+            <div>
+              <div class="pc-name">${lib.name}</div>
+              <div class="pc-campus">${lib.campus}</div>
+            </div>
+            <div class="pc-status">✓ Earned · ${formatHours(p.ms)} studied</div>
+          </div>`;
+        }
+        return `<div class="postcard-full locked">
+          <div class="pc-emoji">🔒</div>
+          <div>
+            <div class="pc-name">${lib.name}</div>
+            <div class="pc-campus">${lib.campus}</div>
+          </div>
+          <div class="pc-status">${remainingMin}m more · ${p.pct}%</div>
+        </div>`;
+      }).join('');
+      modal.classList.add('active');
+    }
+    function closePostcardModal() {
+      document.getElementById('postcard-modal').classList.remove('active');
+    }
+
+    function facilityIcons(f) {
+      const items = [];
+      if (f.seats) items.push(`💺 ${f.seats} seats`);
+      if (f.floors) items.push(`🏢 ${f.floors}`);
+      if (f.booth1) items.push(`🎧 1p booth`);
+      if (f.booth2) items.push(`👥 2p booth`);
+      if (f.group) items.push(`🪑 Group rooms`);
+      if (f.postgrad) items.push(`🎓 Postgrad`);
+      if (f.lowLight) items.push(`🌙 Low-light`);
+      if (f.kitchen) items.push(`☕ Kitchen`);
+      if (f.special) items.push(`✨ ${f.special}`);
+      return items.map(i => `<span>${i}</span>`).join('');
+    }
+
+    function mayorHtml(libId) {
+      const mayor = getMayor(libId);
+      if (!mayor) return `<div class="mayor-line">👑 No mayor yet — first to study 1h this week wins.</div>`;
+      if (mayor.isYou) return `<div class="mayor-line you">👑 <strong>You're the mayor</strong> · ${mayor.minutes}m this week</div>`;
+      return `<div class="mayor-line">👑 Mayor: <strong>${mayor.sessionId.slice(0,8)}...</strong> · ${mayor.minutes}m this week</div>`;
+    }
+
+    function floorGuideHtml(lib) {
+      if (!lib.floorGuide || !lib.floorGuide.length) return '';
+      const NOISE_LABEL = { silent: "Silent", quiet: "Quiet", moderate: "Mixed", lively: "Lively" };
+      const items = lib.floorGuide.map(f => {
+        const noiseTag = f.noise
+          ? `<span class="floor-noise noise-${f.noise}">${NOISE_LABEL[f.noise] || f.noise}</span>`
+          : `<span class="floor-noise empty">—</span>`;
+        return `
+          <div class="floor-item">
+            <div class="floor-row"><span class="lvl">${f.label}</span>${noiseTag}<span class="note">${f.note}</span></div>
+            ${floorVoteHtml(lib.id, f.label)}
+          </div>`;
+      }).join('');
+      return `
+        <div class="floor-guide" data-lib="${lib.id}">
+          <div class="floor-guide-label">🏢 Floor guide <span class="floor-guide-sub">— how's it right now?</span></div>
+          <div class="floor-list">${items}</div>
+        </div>`;
+    }
+
+    function floorVoteHtml(libId, label) {
+      const s = getFloorVoteSummary(libId, label);
+      const mine = getMyFloorVote(libId, label);
+      const here = countFloorCheckins(libId, label);
+      const myHere = myFloorCheckin(libId, label);
+      const btn = (key, emoji, lbl) => {
+        const isMine = mine && mine.vote === key;
+        const count = s[key] || 0;
+        return `<button class="floor-vote-btn ${isMine ? 'mine' : ''}" data-lib="${libId}" data-floor="${label}" data-vote="${key}" title="${lbl}">${emoji}${count > 0 ? `·${count}` : ''}</button>`;
+      };
+      const hereBtn = `<button class="floor-here-btn ${myHere ? 'mine' : ''}" data-lib="${libId}" data-floor="${label}" title="${myHere ? 'Checked in here — tap to clear' : 'Check in at this floor'}">✋${here > 0 ? `·${here}` : ''}</button>`;
+      let tally;
+      const voteAgo = formatAgo(s.lastTs);
+      const parts = [];
+      if (mine) {
+        const myAgo = mine.ageMin === 0 ? 'just now' : `${mine.ageMin}m ago`;
+        parts.push(s.total > 1 ? `your vote · ${myAgo} · ${s.total} total` : `your vote · ${myAgo}`);
+      } else if (s.total) {
+        parts.push(`vote updated ${voteAgo} · ${s.total}`);
+      }
+      if (myHere) {
+        const hAgo = myHere.ageMin === 0 ? 'just now' : `${myHere.ageMin}m ago`;
+        parts.push(here > 1 ? `you here · ${hAgo} · ${here} studying` : `you here · ${hAgo}`);
+      } else if (here) {
+        parts.push(`${here} studying here`);
+      }
+      tally = parts.length ? parts.join(' · ') : 'tap to vote or check in';
+      const showClear = mine || myHere;
+      return `
+        <div class="floor-vote" data-floor="${label}">
+          ${btn('quiet', '😌', 'Quiet')}
+          ${btn('ok', '😐', 'OK')}
+          ${btn('loud', '😣', 'Loud')}
+          ${hereBtn}
+          <span class="floor-vote-tally">${tally}</span>
+          ${showClear ? `<button class="floor-vote-clear" data-lib="${libId}" data-floor="${label}" title="Clear your vote and check-in">×</button>` : ''}
+        </div>`;
+    }
+
+    function studentTipsHtml(lib) {
+      if (!lib.studentTips || !lib.studentTips.length) return '';
+      const tips = lib.studentTips.map(t =>
+        `<div><span class="tip-text">"${t.text}"</span><span class="tip-source">— ${t.source}</span></div>`
+      ).join('');
+      return `<div class="student-tips">${tips}</div>`;
+    }
+
+    function postcardMiniHtml(libId) {
+      const lib = LIBRARIES.find(l => l.id === libId);
+      const p = getPostcardProgress(libId);
+      const remainingMin = Math.ceil(p.neededMs / 60000);
+      return `
+        <div class="postcard-section">
+          <div class="postcard-label">🖼️ Postcard ${p.unlocked ? 'unlocked' : 'progress'}</div>
+          <div class="postcard-mini ${p.unlocked ? 'unlocked' : ''}">
+            <div class="postcard-mini-thumb ${p.unlocked ? 'unlocked' : ''}" ${p.unlocked ? `style="background:${lib.postcard.gradient}"` : ''}>
+              ${p.unlocked ? lib.postcard.emoji : '🔒'}
+            </div>
+            <div class="postcard-mini-text">
+              <strong>${p.unlocked ? `${lib.name} postcard` : `${formatHours(p.ms)} / 2h`}</strong>
+              ${p.unlocked ? `<span style="color:var(--muted)">Earned at 2h focus time</span>` : `<span style="color:var(--muted)">${remainingMin}m more to unlock</span>`}
+              <div class="postcard-progress"><span style="width:${p.pct}%"></span></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function pomoSectionHtml(libId) {
+      const active = getActivePomo();
+      if (active && active.libId === libId) {
+        const min = Math.floor(active.remainingMs / 60000);
+        const sec = Math.floor((active.remainingMs % 60000) / 1000);
+        const timeStr = `${min}:${String(sec).padStart(2, '0')}`;
+        return `
+          <div class="pomo-section pomo-active">
+            <div class="pomo-label">Focus session running</div>
+            <div class="pomo-countdown" id="pomo-cd-${libId}">${timeStr}</div>
+            <div class="pomo-actions">
+              <button class="pomo-stop" data-lib="${libId}">Stop</button>
+              <button class="primary pomo-finish" data-lib="${libId}">Mark complete</button>
+            </div>
+          </div>`;
+      }
+      const otherActive = active && active.libId !== libId;
+      const lockMsg = otherActive ? `<div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center">Already studying at ${LIBRARIES.find(l=>l.id===active.libId)?.name}</div>` : '';
+      return `
+        <div class="pomo-section">
+          <div class="pomo-label">🍅 Start a focus session here</div>
+          <div class="pomo-buttons">
+            <button class="pomo-btn" data-lib="${libId}" data-min="25" ${otherActive ? 'disabled style="opacity:0.4;cursor:not-allowed"' : ''}>▶ 25m</button>
+            <button class="pomo-btn" data-lib="${libId}" data-min="50" ${otherActive ? 'disabled style="opacity:0.4;cursor:not-allowed"' : ''}>▶ 50m</button>
+            <button class="pomo-btn" data-lib="${libId}" data-min="90" ${otherActive ? 'disabled style="opacity:0.4;cursor:not-allowed"' : ''}>▶ 90m</button>
+          </div>
+          ${lockMsg}
+        </div>`;
+    }
+
+    // Compact "quick line" — what answers "is it crowded?" without expanding
+    function quickLineHtml(libId) {
+      const dom = dominantStatus(libId);
+      const checkins = countStudying(libId);
+      const parts = [];
+      if (dom) {
+        const d = STATUS_DISPLAY[dom.status];
+        const pct = Math.round((dom.count / dom.total) * 100);
+        parts.push(`<span class="pill ${d.pillClass}">${d.emoji} ${pct}% ${d.label}</span>`);
+      } else {
+        parts.push(`<span style="color:var(--muted)">No community reports yet</span>`);
+      }
+      if (checkins > 0) {
+        parts.push(`<strong>${checkins}</strong> here now`);
+      }
+      return `<div class="quick-line">${parts.join(' · ')}</div>`;
+    }
+
+    function renderCard(lib) {
+      const fav = isFavorite(lib.id);
+      const expanded = isExpanded(lib.id);
+      const c = CAMPUS_COLORS[lib.campus] || CAMPUS_COLORS["St Lucia"];
+      const noiseLabel = { silent: "Silent", quiet: "Quiet", moderate: "Mixed", lively: "Lively" }[lib.noise] || "—";
+      const active = getActivePomo();
+      const pomoRunningHere = active && active.libId === lib.id;
+      const gpsOK = getRecentGpsVerified(lib.id);
+      const pick = getMyStatusPick(lib.id);
+      const counts = getStatusCounts(lib.id);
+      const statusBtn = (status) => {
+        const d = STATUS_DISPLAY[status];
+        const isMine = pick && pick.status === status;
+        return `<button class="status-btn ${isMine ? 'user-pick' : ''}" data-lib="${lib.id}" data-status="${status}">
+          <span class="emoji">${d.emoji}</span>
+          <span class="label">${d.label}</span>
+          <span class="count">${counts[status]}</span>
+        </button>`;
+      };
+
+      // SUMMARY (always visible) ----------------------
+      const summary = `
+        <button class="fav-btn ${fav ? 'active' : ''}" data-lib="${lib.id}" title="Pin to top">${fav ? '⭐' : '☆'}</button>
+        <div class="card-header">
+          <h2>${lib.name}</h2>
+          <span class="campus-tag" style="background: ${c.bg}; color: ${c.text}">${lib.campus}</span>
+        </div>
+        <div class="meta-line">
+          <span class="noise-tag noise-${lib.noise}">${noiseLabel}</span>
+          ${lib.quietNote ? `<span class="quiet-note">${lib.quietNote}</span>` : ''}
+        </div>
+        <div class="hours-line">📅 ${lib.hours}</div>
+        <div class="vemcount-inline" data-lib-id="${lib.id}" data-widget="${lib.widget}">
+          <span class="vemcount-loading">Loading live occupancy...</span>
+        </div>
+        ${quickLineHtml(lib.id)}
+      `;
+
+      // DETAILS (collapsed by default) ----------------
+      const details = `
+        <div class="card-details">
+          <div class="facilities">${facilityIcons(lib.facilities)}</div>
+          ${floorGuideHtml(lib)}
+          ${studentTipsHtml(lib)}
+          ${mayorHtml(lib.id)}
+          <a href="${lib.uq}" target="_blank" rel="noopener" class="uq-link">↗ exam-period & 24/7 hours · full UQ page</a>
+          <button class="map-toggle" data-lib="${lib.id}">🗺️ Show map</button>
+          <div class="map-frame" id="map-${lib.id}"></div>
+          <div class="gps-row">
+            <button class="gps-btn ${gpsOK ? 'verified' : ''}" data-lib="${lib.id}">${gpsOK ? '✓ Verified — start studying' : '▶️ Start studying here (verify location)'}</button>
+          </div>
+          <div id="gps-msg-${lib.id}"></div>
+          ${SHOW_GAMIFICATION ? pomoSectionHtml(lib.id) : ''}
+          ${SHOW_GAMIFICATION ? postcardMiniHtml(lib.id) : ''}
+          <div class="status-section">
+            <div class="status-label">
+              <span>How is it right now?</span>
+              ${pick ? `<button class="clear-status" data-lib="${lib.id}" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;text-decoration:underline">clear</button>` : ''}
+            </div>
+            <div id="summary-${lib.id}">${statusSummaryHtml(lib.id)}</div>
+            <div class="status-row" id="status-row-${lib.id}">
+              ${statusBtn('quiet')}
+              ${statusBtn('ok')}
+              ${statusBtn('crowded')}
+            </div>
+            <div class="your-pick-line" id="pick-${lib.id}">${pick ? `Your report: ${STATUS_DISPLAY[pick.status].emoji} ${STATUS_DISPLAY[pick.status].label} · ${pick.ageMin}m ago — tap another to update` : ''}</div>
+          </div>
+        </div>
+      `;
+
+      return `
+        <div class="card ${fav ? 'favorited' : ''} ${pomoRunningHere ? 'pomo-running' : ''} ${expanded ? 'expanded' : ''}"
+             style="border-left: 4px solid ${c.text}"
+             data-noise="${lib.noise}" data-fav="${fav}" data-id="${lib.id}"
+             data-postgrad="${lib.facilities.postgrad}"
+             data-booth="${lib.facilities.booth1 || lib.facilities.booth2}"
+             data-kitchen="${lib.facilities.kitchen}">
+          ${summary}
+          ${details}
+          <button class="expand-toggle" data-lib="${lib.id}">${expanded ? '▴ Hide details' : '▾ Floors · Check-in · Map · Status report · Mayor'}</button>
+        </div>
+      `;
+    }
+
+    function renderRooms() {
+      document.getElementById("room-list").innerHTML = ROOMS.map(r => `
+        <div class="room-item">
+          <span class="room-name">${r.building} · ${r.name}</span>
+          <span class="room-cap">${r.capacity} seats</span>
+        </div>
+      `).join("");
+    }
+
+    let observer = null;
+    function setupObserver() {
+      if (observer) observer.disconnect();
+      observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const target = entry.target;
+            const widget = target.dataset.widget;
+            if (widget && !target.querySelector('iframe')) {
+              target.innerHTML = `<iframe src="https://vemcount.app/embed/widget/${widget}?locale=en" loading="lazy"></iframe>`;
+            }
+            observer.unobserve(target);
+          }
+        });
+      }, { rootMargin: '150px' });
+      document.querySelectorAll('.vemcount-inline').forEach(el => observer.observe(el));
+    }
+
+    function renderAll() {
+      document.getElementById("grid").innerHTML = sortedLibraries().map(renderCard).join("");
+      renderCompareBar();
+      renderStatsStrip();
+      attachListeners();
+      setupObserver();
+      updateFloater();
+    }
+
+    function attachListeners() {
+      document.querySelectorAll(".fav-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          toggleFavorite(btn.dataset.lib);
+          renderAll();
+        });
+      });
+      document.querySelectorAll(".expand-toggle").forEach(btn => {
+        btn.addEventListener("click", () => {
+          toggleExpanded(btn.dataset.lib);
+          renderAll();
+        });
+      });
+      document.querySelectorAll(".checkin-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const libId = btn.dataset.lib;
+          recordCheckin(libId);
+          // refresh quick line
+          const card = document.querySelector(`.card[data-id="${libId}"]`);
+          const oldQuick = card.querySelector('.quick-line');
+          if (oldQuick) oldQuick.outerHTML = quickLineHtml(libId);
+          renderCompareBar();
+          btn.classList.add("checked-in");
+          btn.textContent = "✓ Checked in";
+          setTimeout(() => {
+            btn.classList.remove("checked-in");
+            btn.textContent = "✋ I'm here studying";
+          }, 2000);
+        });
+      });
+      document.querySelectorAll(".map-toggle").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const libId = btn.dataset.lib;
+          const lib = LIBRARIES.find(l => l.id === libId);
+          const frame = document.getElementById(`map-${libId}`);
+          if (frame.classList.contains("active")) {
+            frame.classList.remove("active");
+            frame.innerHTML = "";
+            btn.classList.remove("active");
+            btn.textContent = "🗺️ Show map";
+          } else {
+            frame.innerHTML = `<iframe src="${lib.mapsEmbed}" loading="lazy" allowfullscreen></iframe>`;
+            frame.classList.add("active");
+            btn.classList.add("active");
+            btn.textContent = "✕ Hide map";
+          }
+        });
+      });
+      document.querySelectorAll(".gps-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const libId = btn.dataset.lib;
+          const msgEl = document.getElementById(`gps-msg-${libId}`);
+          msgEl.innerHTML = `<div class="gps-msg">📡 Checking your location...</div>`;
+          verifyGPS(libId, (result) => {
+            if (result.ok) {
+              recordCheckin(libId);
+              msgEl.innerHTML = `<div class="gps-msg success">✓ You're at the library (${result.distance}m). Pick a focus length below ↓</div>`;
+              btn.classList.add("verified");
+              btn.textContent = "✓ Verified — start studying";
+              renderCompareBar();
+              renderStatsStrip();
+            } else {
+              const reason = result.distance ? `${result.distance}m away — too far to verify` : (result.reason || 'GPS unavailable');
+              msgEl.innerHTML = `<div class="gps-msg fail">✗ ${reason} — you can still soft check-in above</div>`;
+            }
+            setTimeout(() => { msgEl.innerHTML = ''; }, 5000);
+          });
+        });
+      });
+      document.querySelectorAll(".status-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const libId = btn.dataset.lib;
+          const status = btn.dataset.status;
+          recordOrUpdateStatus(libId, status);
+          updateStatusUI(libId);
+          renderCompareBar();
+          // refresh quick line in summary
+          const card = document.querySelector(`.card[data-id="${libId}"]`);
+          const oldQuick = card.querySelector('.quick-line');
+          if (oldQuick) oldQuick.outerHTML = quickLineHtml(libId);
+        });
+      });
+      document.querySelectorAll(".clear-status").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const libId = btn.dataset.lib;
+          clearStatus(libId);
+          updateStatusUI(libId);
+          renderCompareBar();
+          const card = document.querySelector(`.card[data-id="${libId}"]`);
+          const oldQuick = card.querySelector('.quick-line');
+          if (oldQuick) oldQuick.outerHTML = quickLineHtml(libId);
+        });
+      });
+      document.querySelectorAll(".pomo-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (btn.disabled) return;
+          if ("Notification" in window && Notification.permission === "default") Notification.requestPermission();
+          startPomo(btn.dataset.lib, parseInt(btn.dataset.min, 10));
+          renderAll();
+        });
+      });
+      document.querySelectorAll(".pomo-stop").forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (confirm("Stop the focus session? It won't count toward your streak.")) {
+            stopPomo(); renderAll();
+          }
+        });
+      });
+      document.querySelectorAll(".pomo-finish").forEach(btn => {
+        btn.addEventListener("click", () => { completePomo(); renderAll(); });
+      });
+      attachFloorVoteListeners(document);
+    }
+
+    function attachFloorVoteListeners(scope) {
+      scope.querySelectorAll('.floor-vote-btn').forEach(b => {
+        b.onclick = (e) => {
+          e.stopPropagation();
+          const libId = b.dataset.lib;
+          const floor = b.dataset.floor;
+          const vote = b.dataset.vote;
+          const mine = getMyFloorVote(libId, floor);
+          if (mine && mine.vote === vote) clearFloorVote(libId, floor);
+          else recordFloorVote(libId, floor, vote);
+          refreshFloorGuide(libId);
+          renderCompareBar();
+        };
+      });
+      scope.querySelectorAll('.floor-here-btn').forEach(b => {
+        b.onclick = (e) => {
+          e.stopPropagation();
+          const libId = b.dataset.lib;
+          const floor = b.dataset.floor;
+          const mine = myFloorCheckin(libId, floor);
+          if (mine) clearFloorCheckin(libId, floor);
+          else recordFloorCheckin(libId, floor);
+          refreshFloorGuide(libId);
+          // also refresh the lib-level quick-line that shows total studying count
+          const card = document.querySelector(`.card[data-id="${libId}"]`);
+          const oldQuick = card && card.querySelector('.quick-line');
+          if (oldQuick) oldQuick.outerHTML = quickLineHtml(libId);
+          renderCompareBar();
+        };
+      });
+      scope.querySelectorAll('.floor-vote-clear').forEach(b => {
+        b.onclick = (e) => {
+          e.stopPropagation();
+          clearFloorVote(b.dataset.lib, b.dataset.floor);
+          clearFloorCheckin(b.dataset.lib, b.dataset.floor);
+          refreshFloorGuide(b.dataset.lib);
+          const card = document.querySelector(`.card[data-id="${b.dataset.lib}"]`);
+          const oldQuick = card && card.querySelector('.quick-line');
+          if (oldQuick) oldQuick.outerHTML = quickLineHtml(b.dataset.lib);
+          renderCompareBar();
+        };
+      });
+    }
+
+    function refreshFloorGuide(libId) {
+      const card = document.querySelector(`.card[data-id="${libId}"]`);
+      const lib = LIBRARIES.find(l => l.id === libId);
+      if (!card || !lib) return;
+      const existing = card.querySelector('.floor-guide');
+      if (!existing) return;
+      const tmp = document.createElement('div');
+      tmp.innerHTML = floorGuideHtml(lib);
+      const next = tmp.firstElementChild;
+      existing.replaceWith(next);
+      attachFloorVoteListeners(card);
+    }
+
+    function updateStatusUI(libId) {
+      const counts = getStatusCounts(libId);
+      const pick = getMyStatusPick(libId);
+      const row = document.getElementById(`status-row-${libId}`);
+      if (!row) return;
+      const summaryEl = document.getElementById(`summary-${libId}`);
+      if (summaryEl) summaryEl.innerHTML = statusSummaryHtml(libId);
+      row.innerHTML = ['quiet', 'ok', 'crowded'].map(status => {
+        const d = STATUS_DISPLAY[status];
+        const isMine = pick && pick.status === status;
+        return `<button class="status-btn ${isMine ? 'user-pick' : ''}" data-lib="${libId}" data-status="${status}">
+          <span class="emoji">${d.emoji}</span>
+          <span class="label">${d.label}</span>
+          <span class="count">${counts[status]}</span>
+        </button>`;
+      }).join('');
+      const pickLine = document.getElementById(`pick-${libId}`);
+      if (pickLine) pickLine.innerHTML = pick ? `Your report: ${STATUS_DISPLAY[pick.status].emoji} ${STATUS_DISPLAY[pick.status].label} · ${pick.ageMin}m ago — tap another to update` : '';
+      const label = row.previousElementSibling?.previousElementSibling;
+      if (label && label.classList.contains('status-label')) {
+        const clearBtn = label.querySelector('.clear-status');
+        if (pick && !clearBtn) {
+          label.insertAdjacentHTML('beforeend', `<button class="clear-status" data-lib="${libId}" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;text-decoration:underline">clear</button>`);
+        } else if (!pick && clearBtn) clearBtn.remove();
+      }
+      attachListeners();
+    }
+
+    function updateFloater() {
+      const floater = document.getElementById("pomo-floater");
+      if (!SHOW_GAMIFICATION) { floater.classList.remove("active"); floater.style.display = 'none'; return; }
+      const active = getActivePomo();
+      if (!active) { floater.classList.remove("active"); return; }
+      floater.classList.add("active");
+      const lib = LIBRARIES.find(l => l.id === active.libId);
+      document.getElementById("floater-lib").textContent = lib?.name || 'studying';
+      const min = Math.floor(active.remainingMs / 60000);
+      const sec = Math.floor((active.remainingMs % 60000) / 1000);
+      document.getElementById("floater-time").textContent = `${min}:${String(sec).padStart(2, '0')}`;
+    }
+    document.getElementById("floater-stop").addEventListener("click", () => {
+      if (confirm("Stop the focus session?")) { stopPomo(); renderAll(); }
+    });
+    document.getElementById("modal-close").addEventListener("click", closePostcardModal);
+    document.getElementById("postcard-modal").addEventListener("click", (e) => {
+      if (e.target.id === 'postcard-modal') closePostcardModal();
+    });
+
+    function setupGlobalControls() {
+      const filters = {
+        quiet:    { btn: document.getElementById("filter-quiet"),    on: false, predicate: c => c.dataset.noise === 'silent' || c.dataset.noise === 'quiet', onText: "✕ Show all noise", offText: "🤫 Quiet only" },
+        fav:      { btn: document.getElementById("filter-fav"),      on: false, predicate: c => c.dataset.fav === 'true', onText: "✕ Show all libs", offText: "⭐ Favorites" },
+        postgrad: { btn: document.getElementById("filter-postgrad"), on: false, predicate: c => c.dataset.postgrad === 'true', onText: "✕ Postgrad", offText: "🎓 Postgrad" },
+        booth:    { btn: document.getElementById("filter-booth"),    on: false, predicate: c => c.dataset.booth === 'true', onText: "✕ Booth", offText: "🎧 Booth" },
+        kitchen:  { btn: document.getElementById("filter-kitchen"),  on: false, predicate: c => c.dataset.kitchen === 'true', onText: "✕ Kitchen", offText: "☕ Kitchen" },
+      };
+      function applyFilters() {
+        document.querySelectorAll(".card").forEach(card => {
+          let show = true;
+          for (const key in filters) {
+            if (filters[key].on && !filters[key].predicate(card)) { show = false; break; }
+          }
+          card.style.display = show ? "" : "none";
+        });
+      }
+      Object.values(filters).forEach(f => {
+        f.btn.addEventListener("click", () => {
+          f.on = !f.on;
+          f.btn.classList.toggle("active", f.on);
+          f.btn.textContent = f.on ? f.onText : f.offText;
+          applyFilters();
+        });
+      });
+    }
+
+    renderAll();
+    renderRooms();
+    setupGlobalControls();
+
+    setInterval(() => {
+      const active = getActivePomo();
+      if (active) {
+        const min = Math.floor(active.remainingMs / 60000);
+        const sec = Math.floor((active.remainingMs % 60000) / 1000);
+        const timeStr = `${min}:${String(sec).padStart(2, '0')}`;
+        const cd = document.getElementById(`pomo-cd-${active.libId}`);
+        if (cd) cd.textContent = timeStr;
+        document.getElementById("floater-time").textContent = timeStr;
+      } else {
+        const floater = document.getElementById("pomo-floater");
+        if (floater.classList.contains("active")) renderAll();
+      }
+    }, 1000);
+
+    setInterval(() => {
+      LIBRARIES.forEach(lib => {
+        const card = document.querySelector(`.card[data-id="${lib.id}"]`);
+        if (card) {
+          const oldQuick = card.querySelector('.quick-line');
+          if (oldQuick) oldQuick.outerHTML = quickLineHtml(lib.id);
+        }
+      });
+      renderCompareBar();
+      renderStatsStrip();
+    }, 30000);
+  </script>
+</body>
+</html>

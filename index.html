@@ -3,196 +3,286 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Max Huang — for the AMBC CEO-office Associate role</title>
-<meta name="description" content="Max Huang — AI workflows, writing and research. Built for the AMBC Associate (CEO Office) application.">
+<title>Max — for the AMBC Associate role</title>
+<meta name="description" content="Max — AI workflows, writing and research. Four things I built and run, plus a live app you can open. For the AMBC Associate (CEO Office) application.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#FBFAF6; --panel:#FFFFFF; --ink:#15181B; --muted:#5C636B;
-    --line:#E6E2D8; --accent:#15795B; --accent-ink:#0E5D44;
-    --accent-wash:#EAF3EE;
+    --bg:#ffffff; --bg2:#f5f5f7; --ink:#1d1d1f; --muted:#6e6e73;
+    --line:#d2d2d7; --blue:#0066cc; --card:#ffffff;
   }
   *{box-sizing:border-box}
-  html{-webkit-text-size-adjust:100%}
+  html{scroll-behavior:smooth; -webkit-text-size-adjust:100%}
   body{
     margin:0; background:var(--bg); color:var(--ink);
-    font-family:"Inter",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
-    font-size:17px; line-height:1.62; letter-spacing:-0.005em;
-    -webkit-font-smoothing:antialiased;
+    font-family:"SF Pro Display","SF Pro Text",-apple-system,BlinkMacSystemFont,"Inter","Helvetica Neue",sans-serif;
+    line-height:1.5; letter-spacing:-0.011em; -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:780px; margin:0 auto; padding:0 26px}
-  a{color:var(--accent-ink); text-decoration:none; border-bottom:1px solid rgba(21,121,91,.3); transition:border-color .15s,color .15s}
-  a:hover{color:var(--accent); border-color:var(--accent)}
-  h1,h2,h3{font-family:"Newsreader",Georgia,serif; font-weight:500; letter-spacing:-0.01em; line-height:1.15}
-  .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+  a{color:var(--blue); text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:980px; margin:0 auto; padding:0 24px}
+  .inner{max-width:720px}
+  .mono{font-size:12px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:var(--muted)}
+
+  /* NAV */
+  nav{position:sticky; top:0; z-index:50; background:rgba(255,255,255,.8); backdrop-filter:saturate(180%) blur(20px); -webkit-backdrop-filter:saturate(180%) blur(20px); border-bottom:1px solid rgba(0,0,0,.06)}
+  nav .wrap{display:flex; align-items:center; justify-content:space-between; height:48px}
+  nav .brand{font-weight:600; font-size:18px; letter-spacing:-0.02em}
+  nav .right{font-size:14px; color:var(--muted)}
+  nav .right a{color:var(--ink)}
 
   /* HERO */
-  header{padding:78px 0 30px}
-  .eyebrow{color:var(--accent-ink); font-weight:600}
-  h1{font-size:54px; margin:18px 0 6px}
-  .tagline{font-family:"Newsreader",Georgia,serif; font-size:23px; color:var(--ink); margin:0 0 22px; max-width:39ch; font-weight:400}
-  .tagline b{font-weight:600; color:var(--accent-ink)}
-  .meta{display:flex; flex-wrap:wrap; gap:7px 16px; font-size:14.5px; color:var(--muted); padding-top:6px; border-top:1px solid var(--line)}
-  .meta b{color:var(--ink); font-weight:500}
-  .accentrule{height:3px; width:54px; background:var(--accent); margin:26px 0 0; border-radius:2px}
+  .hero{padding:120px 0 100px; text-align:center}
+  .hero .mono{margin-bottom:22px}
+  .hero h1{font-size:clamp(42px,8vw,82px); font-weight:600; line-height:1.04; letter-spacing:-0.03em; margin:0 auto; max-width:14ch}
+  .hero .sub{font-size:clamp(19px,2.4vw,24px); color:var(--muted); font-weight:400; max-width:30ch; margin:26px auto 0; line-height:1.45}
+  .hero .who{margin-top:34px; font-size:15px; color:var(--muted)}
+  .hero .who b{color:var(--ink); font-weight:500}
+  .scrollcue{margin-top:44px; font-size:13px; color:var(--muted); letter-spacing:.04em}
 
-  /* SECTIONS */
-  section{padding:42px 0; border-top:1px solid var(--line)}
-  .seclabel{display:flex; align-items:baseline; gap:12px; margin-bottom:8px}
-  .seclabel .num{color:var(--accent); font-weight:600}
-  h2{font-size:30px; margin:4px 0 6px}
-  .lede{color:var(--muted); font-size:16px; max-width:62ch; margin:0 0 20px}
+  /* SECTION */
+  section{padding:108px 0}
+  .gray{background:var(--bg2)}
+  .eyebrow{margin-bottom:14px}
+  .h2{font-size:clamp(30px,5vw,50px); font-weight:600; letter-spacing:-0.025em; line-height:1.08; margin:0}
+  .said{font-size:19px; color:var(--muted); max-width:52ch; margin:18px 0 0; line-height:1.5}
 
-  /* PROJECT */
-  .proj{padding:24px 0; border-bottom:1px solid var(--line)}
-  .proj:last-child{border-bottom:0; padding-bottom:4px}
-  .proj h3{font-size:21px; margin:0 0 3px}
-  .proj .what{margin:0 0 16px; color:var(--ink)}
-  .rows{display:grid; grid-template-columns:92px 1fr; gap:9px 18px; align-items:start}
-  .rows .k{font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); padding-top:3px}
-  .rows .v{font-size:15.5px; line-height:1.55; margin:0}
-  .quote{margin:14px 0 0; padding:12px 16px; background:var(--accent-wash); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; font-family:"Newsreader",Georgia,serif; font-size:16px; color:var(--accent-ink)}
-  .quote span{display:block; font-family:ui-monospace,Menlo,monospace; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-top:7px; opacity:.85}
+  /* QUIET hero feature */
+  .feat-head{text-align:center; max-width:640px; margin:0 auto 44px}
+  .feat-head .h2 span{color:var(--blue)}
+  .btn{display:inline-flex; align-items:center; gap:7px; margin-top:26px; background:var(--blue); color:#fff; font-size:16px; font-weight:500; padding:11px 22px; border-radius:980px; letter-spacing:-0.01em}
+  .btn:hover{background:#0a6fe0; text-decoration:none}
+  .btn .arr{transition:transform .2s}
+  .btn:hover .arr{transform:translateX(3px)}
 
-  /* WEEK ONE */
-  .wk{counter-reset:wk; display:grid; gap:16px; margin-top:6px}
-  .wk .item{display:grid; grid-template-columns:34px 1fr; gap:14px}
-  .wk .item::before{counter-increment:wk; content:counter(wk); font-family:"Newsreader",serif; font-size:24px; color:var(--accent); line-height:1.2}
-  .wk h3{font-size:17.5px; margin:2px 0 3px}
-  .wk p{margin:0; font-size:15.5px; color:var(--muted)}
-  .wk p b{color:var(--ink); font-weight:500}
+  /* browser frame */
+  .browser{background:#fff; border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow:0 30px 60px -28px rgba(0,0,0,.28), 0 8px 20px -12px rgba(0,0,0,.12)}
+  .browser .bar{display:flex; align-items:center; gap:8px; padding:11px 14px; background:#f6f6f8; border-bottom:1px solid var(--line)}
+  .browser .dot{width:11px; height:11px; border-radius:50%}
+  .browser .pill{flex:1; text-align:center; font-size:12px; color:var(--muted); background:#fff; border:1px solid var(--line); border-radius:7px; padding:4px 10px; max-width:340px; margin:0 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .browser iframe{width:100%; height:560px; border:0; display:block; background:#faf9fc}
+  .cap{text-align:center; font-size:14px; color:var(--muted); margin-top:18px}
 
-  /* AI NOTE */
-  .ainote{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px 24px}
-  .ainote h2{font-size:21px; margin:0 0 8px}
-  .ainote p{margin:0; color:var(--muted); font-size:15.5px}
+  /* FEATURE rows */
+  .feature{display:grid; grid-template-columns:1fr 1fr; gap:54px; align-items:center; margin-top:88px}
+  .feature:first-of-type{margin-top:52px}
+  .feature.rev .vis{order:2}
+  .feature h3{font-size:clamp(26px,3.2vw,34px); font-weight:600; letter-spacing:-0.02em; margin:0 0 14px; line-height:1.1}
+  .feature p{font-size:18px; color:var(--muted); margin:0 0 14px; line-height:1.55}
+  .feature .credit{font-size:13.5px; color:var(--muted)}
+  .feature .credit b{color:var(--ink); font-weight:500}
+  .tag{display:inline-block; font-size:12px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--blue); margin-bottom:10px}
+
+  /* phone frame */
+  .phone{justify-self:center; width:248px; max-width:100%; background:#1d1d1f; border-radius:38px; padding:11px; box-shadow:0 30px 55px -26px rgba(0,0,0,.45)}
+  .phone .screen{border-radius:28px; overflow:hidden; background:#fff; position:relative}
+  .phone .notch{position:absolute; top:0; left:50%; transform:translateX(-50%); width:42%; height:20px; background:#1d1d1f; border-radius:0 0 14px 14px; z-index:2}
+  .phone img{width:100%; display:block}
+
+  /* report card */
+  .reportcard{background:#fff; border:1px solid var(--line); border-radius:18px; padding:26px 26px 22px; box-shadow:0 24px 50px -30px rgba(0,0,0,.25)}
+  .reportcard .rc-top{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px}
+  .reportcard .rc-src{font-size:12px; color:var(--muted); font-weight:600; letter-spacing:.04em}
+  .pillc{font-size:12px; font-weight:600; color:#0a7d3b; background:#e7f6ed; border-radius:980px; padding:5px 12px; white-space:nowrap}
+  .reportcard .rc-topic{font-size:13px; color:var(--muted); margin-bottom:8px}
+  .reportcard .rc-fore{font-size:19px; font-weight:500; letter-spacing:-0.01em; line-height:1.4; color:var(--ink); margin:0 0 18px}
+  .reportcard .rc-meta{display:flex; flex-wrap:wrap; gap:8px}
+  .reportcard .chip{font-size:11.5px; color:var(--muted); background:var(--bg2); border-radius:6px; padding:4px 9px; font-weight:500}
+
+  /* openclaw grid */
+  .ocgrid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px}
+  .agentcard{background:#fff; border:1px solid var(--line); border-radius:13px; padding:14px 15px}
+  .agentcard .an{font-size:15px; font-weight:600; letter-spacing:-0.01em}
+  .agentcard .ar{font-size:12.5px; color:var(--muted); margin-top:3px; line-height:1.4}
+
+  /* week one */
+  .weeks{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:46px}
+  .weekcard{background:#fff; border:1px solid var(--line); border-radius:16px; padding:26px 24px}
+  .weekcard .num{font-size:14px; font-weight:600; color:var(--blue); margin-bottom:12px}
+  .weekcard h4{font-size:19px; font-weight:600; letter-spacing:-0.015em; margin:0 0 9px; line-height:1.2}
+  .weekcard p{font-size:15px; color:var(--muted); margin:0; line-height:1.5}
+
+  /* ai note */
+  .ainote{max-width:680px; margin:0 auto; text-align:center}
+  .ainote p{font-size:20px; color:var(--muted); line-height:1.55; margin:18px 0 0}
   .ainote p b{color:var(--ink); font-weight:500}
 
-  footer{padding:34px 0 70px; border-top:1px solid var(--line); color:var(--muted); font-size:14.5px}
-  footer a{font-weight:500}
+  /* footer */
+  footer{padding:54px 0; border-top:1px solid var(--line); text-align:center; color:var(--muted); font-size:14px}
+  footer .fbrand{font-size:17px; font-weight:600; color:var(--ink); letter-spacing:-0.02em}
+  footer .frow{margin-top:10px}
+  footer a{color:var(--muted)}
+  footer a:hover{color:var(--ink)}
 
-  @media (max-width:560px){
-    body{font-size:16px}
-    h1{font-size:40px}
-    .tagline{font-size:20px}
-    h2{font-size:25px}
-    .rows{grid-template-columns:1fr; gap:2px 0}
-    .rows .k{padding-top:10px}
-    header{padding:54px 0 24px}
+  @media (max-width:760px){
+    section{padding:76px 0}
+    .hero{padding:84px 0 68px}
+    .feature{grid-template-columns:1fr; gap:28px; margin-top:64px}
+    .feature.rev .vis{order:0}
+    .ocgrid{grid-template-columns:1fr}
+    .weeks{grid-template-columns:1fr; gap:14px}
+    .browser iframe{height:460px}
   }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header>
-    <div class="mono eyebrow">For the AMBC Associate — CEO Office</div>
-    <h1>Max Huang</h1>
-    <p class="tagline">I build and run <b>AI workflows</b>, and I turn messy inputs into <b>structured writing</b>. I already do this every day — for myself.</p>
-    <div class="meta">
-      <span><b>Brisbane, AU</b> · relocating to China</span>
-      <span><b>UQ</b> · Business Management, grad Jun 2026</span>
-      <span><a href="mailto:huangmmax@gmail.com">huangmmax@gmail.com</a></span>
-      <span><a href="https://github.com/maxi-max-dev">github.com/maxi-max-dev</a></span>
+<nav>
+  <div class="wrap">
+    <span class="brand">Max</span>
+    <span class="right"><a href="mailto:huangmmax@outlook.com">huangmmax@outlook.com</a></span>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="mono">For the AMBC Associate · CEO Office</div>
+    <h1>You said: show us something.</h1>
+    <p class="sub">So here are four — built and run in my own time, with AI as the main instrument. One is live below. Go click it.</p>
+    <div class="who"><b>Max</b> · Brisbane · UQ Business Management · grad Jun 2026</div>
+    <div class="scrollcue">↓</div>
+  </div>
+</header>
+
+<!-- QUIET -->
+<section class="gray">
+  <div class="wrap">
+    <div class="feat-head">
+      <div class="mono eyebrow">Live app · click anything</div>
+      <h2 class="h2">Quiet — find a <span>quiet</span> place to study</h2>
+      <p class="said" style="margin-left:auto;margin-right:auto;text-align:center">A single-file web app I designed and built for UQ students. It reads <b>live room-occupancy data</b> and tells you where it's empty right now — real data, not a mockup.</p>
+      <a class="btn" href="quiet/index.html" target="_blank" rel="noopener">Open the live app <span class="arr">→</span></a>
     </div>
-    <div class="accentrule"></div>
-  </header>
-
-  <section>
-    <div class="seclabel"><span class="mono num">00</span><span class="mono">Why this role</span></div>
-    <h2>Your version just has real stakes</h2>
-    <p class="lede" style="font-size:17px;color:var(--ink);max-width:64ch">
-      You said you care about how someone thinks and how they use AI — not their discipline or year. So instead of a cover letter, here's the evidence: four things I've built and run, in my own time, with AI as the main instrument. Below them are three workflows I'd build for the CEO office in week one. The page itself is one more data point — I made it with Claude Code in well under an hour.
-    </p>
-  </section>
-
-  <section>
-    <div class="seclabel"><span class="mono num">01</span><span class="mono">What I've built &amp; run</span></div>
-    <h2>AI as staff, not novelty</h2>
-    <p class="lede">Each of these runs on its own. I designed the roles, the routing, the failure handling — and I have no engineering background.</p>
-
-    <div class="proj">
-      <h3>MiroFish — a prediction engine that writes a morning brief</h3>
-      <p class="what">A multi-agent “swarm simulation”: it ingests the day's news and policy seeds, builds a small world of AI personas, runs them forward, and writes a structured forecast with a confidence rating.</p>
-      <div class="rows">
-        <div class="k">Pipeline</div><p class="v">News seed → knowledge graph + persona generation → multi-round agent simulation → report synthesis → delivery.</p>
-        <div class="k">How I used AI</div><p class="v">Qwen LLMs drive the agents; Zep gives them long-term memory; the OASIS framework runs the simulation. I wired the pipeline and the daily trigger end-to-end.</p>
-        <div class="k">Result</div><p class="v">Runs unattended every morning and posts the brief to a channel — no hands on it. A recent run forecast the US–China tariff talks at medium-high confidence.</p>
+    <div class="browser">
+      <div class="bar">
+        <span class="dot" style="background:#ff5f57"></span>
+        <span class="dot" style="background:#febc2e"></span>
+        <span class="dot" style="background:#28c840"></span>
+        <span class="pill">maxi-max-dev.github.io/max-huang/quiet</span>
       </div>
+      <iframe src="quiet/index.html" loading="lazy" title="Quiet — live app"></iframe>
+    </div>
+    <p class="cap">It's running right here. Scroll inside it, or open it full-screen above.</p>
+  </div>
+</section>
+
+<!-- WORKFLOWS -->
+<section>
+  <div class="wrap">
+    <div class="inner">
+      <div class="mono eyebrow">Three AI workflows I run</div>
+      <h2 class="h2">AI as staff, not novelty</h2>
+      <p class="said">Each runs on its own. Some I built from scratch, some I wired together from open-source — all of them I operate daily. (No engineering background.)</p>
     </div>
 
-    <div class="proj">
-      <h3>OpenClaw — a 5-agent system I run 24/7</h3>
-      <p class="what">My personal operations desk: five specialised agents — an orchestrator, a market-trading agent, a news monitor, a research/judgment agent, and a mobile agent — that research, draft, trade (in a sharemarket game), and report on their own.</p>
-      <div class="rows">
-        <div class="k">Scope</div><p class="v">~A dozen scheduled jobs running live: morning briefs, weekly news summaries, market reviews, job-market scans, nightly self-review.</p>
-        <div class="k">How I used AI</div><p class="v">I authored each agent's role, model routing, tool permissions and failure handling, plus the schedules — and added live-data browser automation and semantic memory.</p>
-        <div class="k">Result</div><p class="v">A working model of “AI as back-office staff”: it runs unattended with failure alerts and self-recovery when something drops.</p>
-      </div>
-    </div>
-
-    <div class="proj">
-      <h3>Research → written intelligence</h3>
-      <p class="what">Taking messy, multi-source inputs and turning them into a clear written view — the core of this role.</p>
-      <div class="rows">
-        <div class="k">Range</div><p class="v">A 45-page mixed-methods case study synthesising 864+ social posts and 37 job descriptions; consulting research on Australia's online-health sector; and market briefs I write for fun.</p>
-        <div class="k">How I used AI</div><p class="v">AI as a research accelerant and thinking partner — but the thesis, structure and judgment are mine. I always end with an adversarial “real risks, no softening” section.</p>
-      </div>
-      <blockquote class="quote">
-        “Priced for perfection: ~110× price-to-sales — 15× Alphabet's. The story is AI + space + Starlink; the maths isn't cheap.”
-        <span>From a self-initiated SpaceX-IPO brief · translated from the original</span>
-      </blockquote>
-    </div>
-
-    <div class="proj">
-      <h3>Tooling I built when it didn't exist</h3>
-      <p class="what">When a workflow I need isn't there, I build it.</p>
-      <div class="rows">
-        <div class="k">Friday</div><p class="v">A Telegram bot that lets me drive my desktop AI from my phone — kick off research or drafting from anywhere. Self-healing: a watchdog restarts it if it drops.</p>
-        <div class="k">XHS Conductor</div><p class="v">A one-command research skill over Xiaohongshu (China's biggest discovery platform), with fast and deep modes — it expands keywords, captures posts, and writes a synthesis to my notes.</p>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="seclabel"><span class="mono num">02</span><span class="mono">If I started Monday</span></div>
-    <h2>Three workflows I'd build for the CEO office in week one</h2>
-    <p class="lede">Tuned to AMBC — a national peak body working across government, ASX-listed members, scale-ups and universities.</p>
-    <div class="wk">
-      <div class="item">
-        <div>
-          <h3>Member &amp; policy intelligence brief</h3>
-          <p><b>Auto-track ASX announcements, federal/state critical-minerals policy and funding rounds, and member-company news → one tight weekly brief, plus ad-hoc alerts.</b> I already run monitors like this; pointing them at the battery and critical-minerals beat is a config change, not a rebuild.</p>
+    <!-- XHS -->
+    <div class="feature">
+      <div class="vis">
+        <div class="phone">
+          <div class="screen"><div class="notch"></div><img src="assets/xhs-conductor.png" alt="XHS Conductor running a research search on a real phone"></div>
         </div>
       </div>
-      <div class="item">
-        <div>
-          <h3>CEO inputs → finished outputs</h3>
-          <p><b>A workflow that turns voice notes and rough dot points into drafted emails, LinkedIn posts, newsletter sections and member briefs — in the house voice.</b> “Messy input → structured output” is the thing I do most.</p>
-        </div>
-      </div>
-      <div class="item">
-        <div>
-          <h3>Comms &amp; newsletter pipeline</h3>
-          <p><b>Research → draft → your review, on a repeatable cadence</b>, so the content engine keeps running whether or not it's a busy week — with a human (me) on the final read every time.</p>
-        </div>
+      <div class="txt">
+        <span class="tag">I built it</span>
+        <h3>XHS Conductor</h3>
+        <p>One command and it researches Xiaohongshu (China's biggest discovery app) for me — it drives a real phone to search, reads the posts, and writes the findings into my notes.</p>
+        <p class="credit"><b>Fast &amp; deep modes.</b> The screenshot is it mid-run: searching, then auto-summarising 55 posts.</p>
       </div>
     </div>
-  </section>
 
-  <section>
+    <!-- MIROFISH -->
+    <div class="feature rev">
+      <div class="vis">
+        <div class="reportcard">
+          <div class="rc-top">
+            <span class="rc-src">MiroFish · daily forecast</span>
+            <span class="pillc">Confidence: medium-high</span>
+          </div>
+          <div class="rc-topic">US–China trade · next 3–6 months</div>
+          <p class="rc-fore">“Both sides restart high-level talks; a leaders' meeting yields mutual tariff cuts — but tariffs stay the core bargaining chip.”</p>
+          <div class="rc-meta">
+            <span class="chip">168-round simulation</span>
+            <span class="chip">seeds: CNN · SCMP · AFR</span>
+            <span class="chip">auto-posted every morning</span>
+          </div>
+        </div>
+      </div>
+      <div class="txt">
+        <span class="tag">Open-source engine · my automation</span>
+        <h3>MiroFish, on autopilot</h3>
+        <p>An open-source prediction engine that turns the day's news into a structured forecast. I run it on a daily automation — it briefs itself every morning while I sleep, and posts the result.</p>
+        <p class="credit">Engine by <a href="https://github.com/666ghj/MiroFish" target="_blank" rel="noopener">666ghj/MiroFish</a>. <b>The daily pipeline around it is mine.</b></p>
+      </div>
+    </div>
+
+    <!-- OPENCLAW -->
+    <div class="feature">
+      <div class="vis">
+        <div class="ocgrid">
+          <div class="agentcard"><div class="an">Jarvis</div><div class="ar">Orchestrator — nightly retro, inbox, runs the forecast</div></div>
+          <div class="agentcard"><div class="an">Oracle</div><div class="ar">Markets — trades a sharemarket game, pre-open → close reviews</div></div>
+          <div class="agentcard"><div class="an">Watcher</div><div class="ar">News — weekly summaries &amp; discovery picks</div></div>
+          <div class="agentcard"><div class="an">MOSS</div><div class="ar">Research — job-market &amp; deal scouting</div></div>
+          <div class="agentcard" style="grid-column:1 / -1"><div class="an">Mobile</div><div class="ar">Mobile desk — phone-side automation</div></div>
+        </div>
+      </div>
+      <div class="txt">
+        <span class="tag">Open-source runtime · my design</span>
+        <h3>OpenClaw — 5 agents, 24/7</h3>
+        <p>My personal operations desk: five AI agents that research, draft, trade and report on their own — around a dozen scheduled jobs, with failure alerts and self-recovery.</p>
+        <p class="credit">Built on the open-source <b>OpenClaw</b> runtime. <b>The agents, routing and schedules are mine.</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WEEK ONE -->
+<section class="gray">
+  <div class="wrap">
+    <div class="inner">
+      <div class="mono eyebrow">If I started Monday</div>
+      <h2 class="h2">Three workflows I'd build for the CEO office in week one</h2>
+      <p class="said">Tuned to AMBC — a national peak body working across government, ASX-listed members, scale-ups and universities.</p>
+    </div>
+    <div class="weeks">
+      <div class="weekcard">
+        <div class="num">01</div>
+        <h4>Member &amp; policy intelligence</h4>
+        <p>Auto-track ASX announcements, critical-minerals policy and member news → one tight weekly brief, plus ad-hoc alerts. I already run monitors like this.</p>
+      </div>
+      <div class="weekcard">
+        <div class="num">02</div>
+        <h4>CEO inputs → finished outputs</h4>
+        <p>Voice notes and rough dot points → drafted emails, LinkedIn posts and briefs, in the house voice. “Messy input → structured output” is the thing I do most.</p>
+      </div>
+      <div class="weekcard">
+        <div class="num">03</div>
+        <h4>Comms &amp; newsletter pipeline</h4>
+        <p>Research → draft → your review, on a repeatable cadence — so the content engine runs whether or not it's a busy week.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI NOTE -->
+<section>
+  <div class="wrap">
     <div class="ainote">
-      <h2>How I used AI on this page</h2>
-      <p><b>I built this with Claude Code in well under an hour.</b> It read my project files, drafted the copy with me, and deployed it to GitHub Pages. That's the honest answer to “how do you use AI?” — not as a magic box, but as the instrument I reach for first. This page is a small live example of it.</p>
+      <div class="mono eyebrow">How I made this page</div>
+      <h2 class="h2">Built with Claude Code, in under an hour</h2>
+      <p>It read my project files, drafted the copy with me, and shipped it. That's the honest answer to <b>“how do you use AI?”</b> — not as a magic box, but as the instrument I reach for first.</p>
     </div>
-  </section>
+  </div>
+</section>
 
-  <footer>
-    Max Huang · <a href="mailto:huangmmax@gmail.com">huangmmax@gmail.com</a> · Brisbane, relocating to China (fully remote · ~2h ahead of China time) · <a href="https://github.com/maxi-max-dev">github.com/maxi-max-dev</a>
-  </footer>
+<footer>
+  <div class="wrap">
+    <div class="fbrand">Max</div>
+    <div class="frow"><a href="mailto:huangmmax@outlook.com">huangmmax@outlook.com</a> · Brisbane, AU · open to fully remote · <a href="https://github.com/maxi-max-dev" target="_blank" rel="noopener">github.com/maxi-max-dev</a></div>
+  </div>
+</footer>
 
-</div>
 </body>
 </html>
